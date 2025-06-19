@@ -1,59 +1,81 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Zap, ArrowLeft } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Zap, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
+  const { login, isLoading, error, isAuthenticated, clearAuthError } = useAuth();
+    
+  useEffect(() => {
+    if (error) {
+      clearAuthError();
+    }
+  }, [formData, clearAuthError]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
 
     try {
-      // TODO: Replace with actual API call
-      console.log("Login form data:", formData)
+      const result = await login(formData);
+      if (result.meta.requestStatus === "fulfilled") {
+        {
+          toast.success("Login successful", {
+            description: "Welcome back to Nexus!",
+          });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast.success("Login successful", {
-        description: "Welcome back to Nexus!",
-      })
-
-      // Redirect to dashboard
-      router.push("/dashboard")
-    } catch (error) {
+          // Redirect to dashboard
+          router.push("/dashboard");
+        }
+      }
+    } catch (error: any) {
       toast.error("Login failed", {
         description: "Please check your credentials and try again.",
-      })
-    } finally {
-      setIsLoading(false)
+      });
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950 flex items-center justify-center p-4">
@@ -72,7 +94,9 @@ export default function LoginPage() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
                   Nexus
                 </h1>
-                <p className="text-sm text-muted-foreground">Project Management</p>
+                <p className="text-sm text-muted-foreground">
+                  Project Management
+                </p>
               </div>
             </div>
 
@@ -81,7 +105,8 @@ export default function LoginPage() {
                 Welcome back to your workspace
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Continue managing your projects and collaborating with your team. Your dashboard is waiting for you.
+                Continue managing your projects and collaborating with your
+                team. Your dashboard is waiting for you.
               </p>
             </div>
 
@@ -90,19 +115,25 @@ export default function LoginPage() {
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
-                <span className="text-sm font-medium">Secure authentication</span>
+                <span className="text-sm font-medium">
+                  Secure authentication
+                </span>
               </div>
               <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
                 <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
-                <span className="text-sm font-medium">Real-time collaboration</span>
+                <span className="text-sm font-medium">
+                  Real-time collaboration
+                </span>
               </div>
               <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
-                <span className="text-sm font-medium">Advanced project tracking</span>
+                <span className="text-sm font-medium">
+                  Advanced project tracking
+                </span>
               </div>
             </div>
           </div>
@@ -123,8 +154,12 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-                <CardDescription className="text-base">Sign in to your account to continue</CardDescription>
+                <CardTitle className="text-2xl font-bold">
+                  Welcome back
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Sign in to your account to continue
+                </CardDescription>
               </div>
             </CardHeader>
 
@@ -168,7 +203,11 @@ export default function LoginPage() {
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -190,10 +229,10 @@ export default function LoginPage() {
                   {isLoading ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Signing in...
+                      Logging in...
                     </div>
                   ) : (
-                    "Sign in"
+                    "Log in"
                   )}
                 </Button>
               </form>
@@ -212,7 +251,10 @@ export default function LoginPage() {
                 </p>
 
                 <Link href="/">
-                  <Button variant="ghost" className="text-sm hover:scale-105 transition-transform duration-200">
+                  <Button
+                    variant="ghost"
+                    className="text-sm hover:scale-105 transition-transform duration-200"
+                  >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to home
                   </Button>
@@ -223,5 +265,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

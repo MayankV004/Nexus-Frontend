@@ -3,7 +3,6 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import AuthProvider from "@/providers/AuthProvider";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/providers/theme-provider";
 export const metadata: Metadata = {
   title: "Nexus",
@@ -25,11 +24,11 @@ export default function RootLayout({
               defaultTheme="system"
               enableSystem
               disableTransitionOnChange
-            >
-              <SidebarProvider>
-                {children}
-                <Toaster richColors />
-              </SidebarProvider>
+            >     <main>
+
+                {children}      
+            </main>
+                <Toaster richColors />      
             </ThemeProvider>
           </AuthProvider>
         </ReduxProvider>

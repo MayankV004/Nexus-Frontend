@@ -16,6 +16,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/user-nav"
 import { usePathname } from "next/navigation"
+import { SidebarProvider } from "@/components/ui/sidebar"
 
 export default function DashboardLayout({
   children,
@@ -47,6 +48,7 @@ export default function DashboardLayout({
   const breadcrumbs = getBreadcrumbs()
 
   return (
+    <SidebarProvider>
     <div className="flex min-h-screen w-full ">
         <AppSidebar />
         <SidebarInset className="flex-1 ">
@@ -87,5 +89,6 @@ export default function DashboardLayout({
           </main>
         </SidebarInset>
       </div>
+      </SidebarProvider>
   )
 }

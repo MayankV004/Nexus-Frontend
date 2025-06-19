@@ -1,62 +1,119 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { User, Settings, LogOut, CreditCard } from "lucide-react"
-import Link from "next/link"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { User, LogOut, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function UserNav() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLogout, setLogout] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const router = useRouter();
+
+  const { user, logout, fetchUserProfile, isAuthenticated } = useAuth();
+
+  const handleLogout = async () => {
+    setLogout(true);
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      router.push("/");
+    } catch (error) {
+      toast.error("Failed to logout");
+    } finally {
+      setLogout(false);
+    }
+  };
+
+  // Fetch user profile if not already loaded
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (isAuthenticated && !user) {
+        setIsLoadingProfile(true);
+        try {
+          await fetchUserProfile();
+        } catch (error: any) {
+          toast.error(error?.response?.data?.message || "Failed to load profile");
+        } finally {
+          setIsLoadingProfile(false);
+        }
+      }
+    };
+
+    loadUserProfile();
+  }, [isAuthenticated, user, fetchUserProfile]);
+
+  // Don't render if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full transition-all hover:scale-110">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg?height=32&width=32" alt="@johndoe" />
-            <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">JD</AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 animate-in slide-in-from-top-2 duration-200" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
-            <p className="text-xs leading-none text-muted-foreground">john@example.com</p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <div className="z-10">
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+              {isLoadingProfile ? (
+                <Loader2 className="w-3 h-3 text-white animate-spin" />
+              ) : (
+                <span className="text-white text-xs font-medium">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </span>
+              )}
+            </div>
+            <span className="hidden md:inline">
+              {isLoadingProfile ? "Loading..." : user?.name || "User"}
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end">
+          <DropdownMenuLabel>
+            <div className="flex flex-col">
+              <span>{user?.name || "Loading..."}</span>
+              <span className="text-xs text-gray-500">
+                {user?.email || "Loading email..."}
+              </span>
+              {user?.isEmailVerified !== undefined && (
+                <span className={`text-xs ${user.isEmailVerified ? 'text-green-600' : 'text-orange-600'}`}>
+                  {user.isEmailVerified ? '✓ Verified' : '⚠ Unverified'}
+                </span>
+              )}
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuItem asChild className="cursor-pointer">
             <Link href="/dashboard/profile">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link href="/dashboard/settings">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </Link>
+          <DropdownMenuItem
+            className="text-red-600 cursor-pointer"
+            disabled={isLogout}
+            onClick={handleLogout}
+          >
+            {isLogout ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="mr-2 h-4 w-4" />
+            )}
+            <span>{isLogout ? "Logging out..." : "Log out"}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+        </DropdownMenuContent>
+      </div>
     </DropdownMenu>
-  )
+  );
 }

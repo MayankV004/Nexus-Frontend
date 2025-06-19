@@ -8,56 +8,78 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useRouter , useSearchParams } from "next/navigation"
 import { Mail, Zap, ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth";
 
 export default function VerifyEmailPage() {
   const [otp, setOtp] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  // const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get("email") || ""
+
+  const { isLoading , verifyUserEmail ,resendVerification } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
+    e.preventDefault();
+    if(!email ){
+      toast.error("Email is required", {
+        description: "Please provide a valid email address.",
+      })
+      return;
+    }
     try {
-      // TODO: Replace with actual API call
-      console.log("OTP verification:", otp)
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast.success("Email verified successfully", {
+      if (otp.length !== 6) {
+        toast.error("Invalid OTP", {
+          description: "Please enter a valid 6-digit OTP.",
+        })
+        return;
+      }
+      const result = await verifyUserEmail({otp , email})
+      if(result.meta.requestStatus === "fulfilled")
+      { 
+        toast.success("Email verified successfully", {
         description: "Your account has been activated.",
       })
-
-      // Redirect to dashboard
       router.push("/dashboard")
+
+      }
+      
     } catch (error) {
       toast.error("Verification failed", {
         description: "Invalid OTP. Please try again.",
       })
-    } finally {
-      setIsLoading(false)
-    }
+    } 
   }
 
   const handleResendOTP = async () => {
     setIsResending(true)
 
     try {
-      // TODO: Replace with actual API call
-      console.log("Resending OTP")
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast.success("OTP sent", {
-        description: "A new verification code has been sent to your email.",
-      })
-    } catch (error) {
+      
+      if (!email) {
+        toast.error("Email is required", {
+          description: "Please provide a valid email address.",
+        })
+        return
+      }
+      const result = await resendVerification(email)
+      if (result.meta.requestStatus === "fulfilled") {
+        setOtp("") // Clear the OTP input field
+      }
+      if (result.payload.data?.email) {
+        toast.success("OTP resent successfully", {
+          description: `A new verification code has been sent to ${result.payload.data.email}.`,
+        })
+      } else {
+        toast.error("Failed to resend OTP", {
+          description: "Please try again later.",
+        })
+      }
+    } catch (error:any) {
       toast.error("Failed to resend OTP", {
         description: "Please try again later.",
       })

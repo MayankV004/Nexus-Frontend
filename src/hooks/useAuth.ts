@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from './redux';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import {
   loginUser,
   signUpUser,
@@ -35,7 +35,7 @@ export const useAuth = () => {
     if (accessToken && refreshTokenStored) {
       try {
         // Try to fetch user profile with existing token
-        const response = await axios.get('/api/user/profile');
+        const response = await axios.get('/api/v1/user/profile');
         
         dispatch(setCredentials({
           user: response.data.data,

@@ -1,70 +1,103 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Zap, ArrowLeft, Users, Shield, Sparkles } from "lucide-react"
-
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Eye,
+  EyeOff,
+  Zap,
+  ArrowLeft,
+  Users,
+  Shield,
+  Sparkles,
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  });
+
+  const {
+    clearAuth,
+    clearAuthError,
+    isLoading,
+    signUp,
+    error,
+    isAuthenticated,
+  } = useAuth();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (error) {
+      clearAuthError();
+    }
+  }, [formData, clearAuthError]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      clearAuth();
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Password mismatch", {
         description: "Passwords do not match. Please try again.",
-      })
-      return
+      });
+      return;
     }
-
-    setIsLoading(true)
-
     try {
-      // TODO: Replace with actual API call
-      console.log("Signup form data:", formData)
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast.success("Account created successfully", {
-        description: "Please check your email for verification.",
-      })
-
-      // Redirect to email verification
-      router.push("/auth/verify-email")
-    } catch (error) {
+      const result = await signUp(formData);
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success("Account created successfully", {
+          description: "Please check your email for verification.",
+        });
+        // Redirect to email verification
+        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
+      }
+    } catch (error: any) {
       toast.error("Signup failed", {
         description: "Something went wrong. Please try again.",
-      })
-    } finally {
-      setIsLoading(false)
+      });
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-purple-950 flex items-center justify-center p-4">
@@ -83,7 +116,9 @@ export default function SignupPage() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
                   Nexus
                 </h1>
-                <p className="text-sm text-muted-foreground">Project Management</p>
+                <p className="text-sm text-muted-foreground">
+                  Project Management
+                </p>
               </div>
             </div>
 
@@ -92,8 +127,8 @@ export default function SignupPage() {
                 Join thousands of teams
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Start your journey with Nexus today. Create your account and experience the future of project
-                management.
+                Start your journey with Nexus today. Create your account and
+                experience the future of project management.
               </p>
             </div>
 
@@ -102,13 +137,17 @@ export default function SignupPage() {
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <Users className="text-white h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">Collaborate with your team</span>
+                <span className="text-sm font-medium">
+                  Collaborate with your team
+                </span>
               </div>
               <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
                 <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <Shield className="text-white h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">Enterprise-grade security</span>
+                <span className="text-sm font-medium">
+                  Enterprise-grade security
+                </span>
               </div>
               <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -116,18 +155,6 @@ export default function SignupPage() {
                 </div>
                 <span className="text-sm font-medium">AI-powered insights</span>
               </div>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 border border-blue-200/50 dark:border-blue-800/50">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">✨</span>
-                </div>
-                <span className="font-semibold text-blue-900 dark:text-blue-100">Free 14-day trial</span>
-              </div>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                No credit card required. Start with full access to all features.
-              </p>
             </div>
           </div>
         </div>
@@ -147,27 +174,48 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
-                <CardDescription className="text-base">Get started with Nexus today</CardDescription>
+                <CardTitle className="text-2xl font-bold">
+                  Create your account
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Get started with Nexus today
+                </CardDescription>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">
-                    Full Name
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Full Name
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Username
+                    </Label>
+                    <Input
+                      id="username"
+                      name="username"
+                      type="text"
+                      placeholder="Enter your username"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                      className="h-11 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -208,13 +256,20 @@ export default function SignupPage() {
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium"
+                  >
                     Confirm Password
                   </Label>
                   <div className="relative">
@@ -233,9 +288,15 @@ export default function SignupPage() {
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -270,7 +331,10 @@ export default function SignupPage() {
                 </p>
 
                 <Link href="/">
-                  <Button variant="ghost" className="text-sm hover:scale-105 transition-transform duration-200">
+                  <Button
+                    variant="ghost"
+                    className="text-sm hover:scale-105 transition-transform duration-200"
+                  >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to home
                   </Button>
@@ -281,5 +345,5 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,5 @@
 import axios from "@/lib/axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { stat } from "fs";
 
 export interface User {
   id: string;
@@ -342,6 +341,7 @@ const authSlice = createSlice({
         if (state.user) {
           state.user.isEmailVerified = true;
         }
+        state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(verifyEmail.rejected, (state, action) => {

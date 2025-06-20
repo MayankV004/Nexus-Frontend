@@ -62,6 +62,16 @@ export interface AddMemberFormData {
   avatar?: string;
 }
 
+// API Response interfaces to match controller responses
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  count?: number;
+  errors?: string[];
+  error?: string;
+}
+
 const initialState: ProjectState = {
   projects: [],
   currentProject: null,
@@ -76,11 +86,21 @@ export const getAllProjects = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/v1/projects");
-      return response.data;
+      const data: ApiResponse<Project[]> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to fetch projects");
+      }
+      
+      return {
+        data: data.data || [],
+        count: data.count || 0
+      };
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch projects"
-      );
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to fetch projects";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -91,11 +111,18 @@ export const getProjectById = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/api/v1/projects/${id}`);
-      return response.data;
+      const data: ApiResponse<Project> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to fetch project");
+      }
+      
+      return data.data;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch project"
-      );
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to fetch project";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -105,12 +132,38 @@ export const createProject = createAsyncThunk(
   "projects/createProject",
   async (formData: CreateProjectFormData, { rejectWithValue }) => {
     try {
+      // Validate required fields on frontend before sending
+      if (!formData.name || formData.name.trim() === '') {
+        return rejectWithValue("Project name is required");
+      }
+
+      // Validate members if provided
+      if (formData.members && Array.isArray(formData.members)) {
+        for (const member of formData.members) {
+          if (!member.name || !member.email || !member.role) {
+            return rejectWithValue("All members must have name, email, and role");
+          }
+        }
+      }
+
       const response = await axios.post("/api/v1/projects", formData);
-      return response.data;
+      const data: ApiResponse<Project> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to create project");
+      }
+      
+      return data.data;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create project"
-      );
+      // Handle validation errors
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        return rejectWithValue(error.response.data.errors.join(", "));
+      }
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to create project";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -123,12 +176,29 @@ export const updateProject = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      // Validate name if provided
+      if (formData.name !== undefined && (!formData.name || formData.name.trim() === '')) {
+        return rejectWithValue("Project name cannot be empty");
+      }
+
       const response = await axios.put(`/api/v1/projects/${id}`, formData);
-      return response.data;
+      const data: ApiResponse<Project> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to update project");
+      }
+      
+      return data.data;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update project"
-      );
+      // Handle validation errors
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        return rejectWithValue(error.response.data.errors.join(", "));
+      }
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to update project";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -139,11 +209,18 @@ export const deleteProject = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await axios.delete(`/api/v1/projects/${id}`);
-      return { id, ...response.data };
+      const data: ApiResponse<any> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to delete project");
+      }
+      
+      return { id, message: data.message };
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to delete project"
-      );
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to delete project";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -156,15 +233,32 @@ export const addMember = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      // Validate required fields
+      if (!memberData.name || !memberData.email || !memberData.role) {
+        return rejectWithValue("Name, email, and role are required for member");
+      }
+
       const response = await axios.post(
         `/api/v1/projects/${projectId}/members`,
         memberData
       );
-      return response.data;
+      const data: ApiResponse<Project> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to add member");
+      }
+      
+      return data.data;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to add member"
-      );
+      // Handle validation errors
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        return rejectWithValue(error.response.data.errors.join(", "));
+      }
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to add member";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -180,11 +274,18 @@ export const removeMember = createAsyncThunk(
       const response = await axios.delete(
         `/api/v1/projects/${projectId}/members/${memberId}`
       );
-      return response.data;
+      const data: ApiResponse<Project> = response.data;
+      
+      if (!data.success) {
+        return rejectWithValue(data.message || "Failed to remove member");
+      }
+      
+      return data.data;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to remove member"
-      );
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "Failed to remove member";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -250,7 +351,7 @@ const projectSlice = createSlice({
       })
       .addCase(getProjectById.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentProject = action.payload.data;
+        state.currentProject = action.payload!;
         state.error = null;
       })
       .addCase(getProjectById.rejected, (state, action) => {
@@ -266,7 +367,7 @@ const projectSlice = createSlice({
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.projects.unshift(action.payload.data);
+        state.projects.unshift(action.payload!);
         state.totalCount += 1;
         state.error = null;
       })
@@ -283,7 +384,7 @@ const projectSlice = createSlice({
       })
       .addCase(updateProject.fulfilled, (state, action) => {
         state.isLoading = false;
-        const updatedProject = action.payload.data;
+        const updatedProject = action.payload!;
         const projectIndex = state.projects.findIndex(p => p._id === updatedProject._id);
         if (projectIndex !== -1) {
           state.projects[projectIndex] = updatedProject;
@@ -327,7 +428,7 @@ const projectSlice = createSlice({
       })
       .addCase(addMember.fulfilled, (state, action) => {
         state.isLoading = false;
-        const updatedProject = action.payload.data;
+        const updatedProject = action.payload!;
         const projectIndex = state.projects.findIndex(p => p._id === updatedProject._id);
         if (projectIndex !== -1) {
           state.projects[projectIndex] = updatedProject;
@@ -350,7 +451,7 @@ const projectSlice = createSlice({
       })
       .addCase(removeMember.fulfilled, (state, action) => {
         state.isLoading = false;
-        const updatedProject = action.payload.data;
+        const updatedProject = action.payload!;
         const projectIndex = state.projects.findIndex(p => p._id === updatedProject._id);
         if (projectIndex !== -1) {
           state.projects[projectIndex] = updatedProject;

@@ -50,7 +50,7 @@ export const useAuth = () => {
           const refreshResult = await dispatch(refreshToken());
           if (refreshResult.meta.requestStatus === 'fulfilled') {
             // After successful refresh, fetch profile again
-            const profileResponse = await axios.get('/api/user/profile');
+            const profileResponse = await axios.get('/api/v1/user/profile');
             dispatch(updateUser(profileResponse.data.data));
           }
         } catch (refreshError) {
@@ -66,8 +66,9 @@ export const useAuth = () => {
   // Fetch current user profile
   const fetchUserProfile = useCallback(async () => {
     try {
-      const response = await axios.get('/api/user/profile');
+      const response = await axios.get('/api/v1/user/profile');
       dispatch(updateUser(response.data.data));
+      console.log('User profile fetched successfully:', response.data.user);
       return response.data.data;
     } catch (error) {
       console.error('Failed to fetch user profile:', error);

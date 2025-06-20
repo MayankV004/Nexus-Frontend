@@ -56,9 +56,9 @@ export function UserNav() {
   }, [isAuthenticated, user, fetchUserProfile]);
 
   // Don't render if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
+  // if (!isAuthenticated) {
+  //   return null;
+  // }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>

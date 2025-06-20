@@ -43,6 +43,7 @@ export default function SignupPage() {
     signUp,
     error,
     isAuthenticated,
+  
   } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);

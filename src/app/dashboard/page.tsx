@@ -26,165 +26,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-
-// Mock data
-const stats = [
-  {
-    name: "Active Projects",
-    value: "8",
-    change: "+2 from last month",
-    changeType: "positive",
-    icon: FolderOpen,
-    color: "from-blue-500 to-blue-600",
-    bgColor: "from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900",
-    textColor: "text-blue-600 dark:text-blue-400",
-  },
-  {
-    name: "Open Issues",
-    value: "23",
-    change: "-5 from last week",
-    changeType: "positive",
-    icon: AlertCircle,
-    color: "from-orange-500 to-orange-600",
-    bgColor:
-      "from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900",
-    textColor: "text-orange-600 dark:text-orange-400",
-  },
-  {
-    name: "Team Members",
-    value: "12",
-    change: "+3 new members",
-    changeType: "positive",
-    icon: Users,
-    color: "from-green-500 to-green-600",
-    bgColor: "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900",
-    textColor: "text-green-600 dark:text-green-400",
-  },
-  {
-    name: "Completed Tasks",
-    value: "156",
-    change: "+23% this month",
-    changeType: "positive",
-    icon: CheckCircle2,
-    color: "from-purple-500 to-purple-600",
-    bgColor:
-      "from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900",
-    textColor: "text-purple-600 dark:text-purple-400",
-  },
-];
-
-const recentProjects = [
-  {
-    id: 1,
-    name: "E-commerce Platform",
-    description: "Modern online shopping platform with advanced features",
-    progress: 75,
-    issues: 12,
-    members: [
-      { id: 1, name: "John Doe", avatar: "/placeholder.svg" },
-      { id: 2, name: "Jane Smith", avatar: "/placeholder.svg" },
-      { id: 3, name: "Mike Johnson", avatar: "/placeholder.svg" },
-    ],
-    status: "In Progress",
-    dueDate: "2024-03-15",
-    priority: "High",
-  },
-  {
-    id: 2,
-    name: "Mobile App Redesign",
-    description: "Complete UI/UX overhaul for mobile application",
-    progress: 45,
-    issues: 8,
-    members: [
-      { id: 4, name: "Sarah Wilson", avatar: "/placeholder.svg" },
-      { id: 5, name: "Tom Brown", avatar: "/placeholder.svg" },
-    ],
-    status: "In Progress",
-    dueDate: "2024-04-01",
-    priority: "Medium",
-  },
-  {
-    id: 3,
-    name: "API Integration",
-    description: "Third-party service integration and optimization",
-    progress: 90,
-    issues: 3,
-    members: [
-      { id: 1, name: "John Doe", avatar: "/placeholder.svg" },
-      { id: 2, name: "Jane Smith", avatar: "/placeholder.svg" },
-    ],
-    status: "Review",
-    dueDate: "2024-02-20",
-    priority: "High",
-  },
-];
-
-const recentActivity = [
-  {
-    id: 1,
-    user: { name: "John Doe", avatar: "/placeholder.svg" },
-    action: "completed issue",
-    target: "Login page responsiveness",
-    project: "E-commerce Platform",
-    time: "2 hours ago",
-    type: "issue",
-  },
-  {
-    id: 2,
-    user: { name: "Sarah Wilson", avatar: "/placeholder.svg" },
-    action: "created project",
-    target: "Mobile App Redesign",
-    project: null,
-    time: "4 hours ago",
-    type: "project",
-  },
-  {
-    id: 3,
-    user: { name: "Mike Johnson", avatar: "/placeholder.svg" },
-    action: "commented on",
-    target: "Payment gateway integration",
-    project: "E-commerce Platform",
-    time: "6 hours ago",
-    type: "comment",
-  },
-  {
-    id: 4,
-    user: { name: "Jane Smith", avatar: "/placeholder.svg" },
-    action: "updated status of",
-    target: "Database optimization",
-    project: "API Integration",
-    time: "1 day ago",
-    type: "update",
-  },
-];
-
-const upcomingDeadlines = [
-  {
-    id: 1,
-    title: "API Integration Review",
-    project: "API Integration",
-    dueDate: "2024-02-20",
-    priority: "High",
-    daysLeft: 3,
-  },
-  {
-    id: 2,
-    title: "Mobile App Prototype",
-    project: "Mobile App Redesign",
-    dueDate: "2024-02-25",
-    priority: "Medium",
-    daysLeft: 8,
-  },
-  {
-    id: 3,
-    title: "E-commerce Launch",
-    project: "E-commerce Platform",
-    dueDate: "2024-03-15",
-    priority: "Critical",
-    daysLeft: 25,
-  },
-];
-
+import { useProjects } from "@/hooks/useProject";
+import { useEffect } from "react";
 const getStatusColor = (status: string) => {
   switch (status) {
     case "In Progress":
@@ -230,6 +73,136 @@ const getActivityIcon = (type: string) => {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { 
+    projects, 
+    isLoading, 
+    error, 
+    totalCount,
+    fetchAllProjects,
+    getProjectsByStatus,
+    getOverdueProjects,
+    clearProjectError 
+  } = useProjects();
+  // Fetch projects on component mount
+  useEffect(() => {
+    fetchAllProjects();
+  }, [fetchAllProjects]);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => {
+      if (error) {
+        clearProjectError();
+      }
+    };
+  }, [error, clearProjectError]);
+  
+  const stats = [
+    {
+      name: "Active Projects",
+      value: getProjectsByStatus('In Progress').length.toString(),
+      change: `+${Math.max(0, getProjectsByStatus('In Progress').length - 6)} from last month`,
+      changeType: "positive",
+      icon: FolderOpen,
+      color: "from-blue-500 to-blue-600",
+      bgColor: "from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900",
+      textColor: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      name: "Open Issues",
+      value: projects.reduce((sum, project) => sum + (project.issues || 0), 0).toString(),
+      change: "-5 from last week", // You can calculate this based on your needs
+      changeType: "positive",
+      icon: AlertCircle,
+      color: "from-orange-500 to-orange-600",
+      bgColor: "from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900",
+      textColor: "text-orange-600 dark:text-orange-400",
+    },
+    {
+      name: "Total Projects",
+      value: totalCount.toString(),
+      change: `${projects.length} active projects`,
+      changeType: "positive",
+      icon: Users,
+      color: "from-green-500 to-green-600",
+      bgColor: "from-green-50 to-green-100 dark:from-green-950 dark:to-green-900",
+      textColor: "text-green-600 dark:text-green-400",
+    },
+    {
+      name: "Completed Tasks",
+      value: getProjectsByStatus('Completed').length.toString(),
+      change: "+23% this month", // You can calculate this based on your needs
+      changeType: "positive",
+      icon: CheckCircle2,
+      color: "from-purple-500 to-purple-600",
+      bgColor: "from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900",
+      textColor: "text-purple-600 dark:text-purple-400",
+    },
+  ];
+
+    // Get recent projects (limit to 3)
+  const recentProjects = projects
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 3)
+    .map(project => ({
+      id: project._id,
+      name: project.name,
+      description: project.description,
+      progress: project.progress,
+      issues: project.issues,
+      members: project.members,
+      status: project.status,
+      dueDate: project.dueDate ? new Date(project.dueDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      priority: project.priority,
+    }));
+
+  // Calculate upcoming deadlines
+  const upcomingDeadlines = projects
+    .filter(project => project.dueDate && project.status !== 'Completed')
+    .map(project => {
+      const dueDate = new Date(project.dueDate!);
+      const today = new Date();
+      const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      return {
+        id: project._id,
+        title: `${project.name} Completion`,
+        project: project.name,
+        dueDate: dueDate.toISOString().split('T')[0],
+        priority: project.priority,
+        daysLeft: Math.max(0, daysLeft),
+      };
+    })
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, 3);
+
+    if (isLoading && projects.length === 0) {
+    return (
+      <div className="space-y-8 w-full">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-muted-foreground">Loading projects...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-8 w-full">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button onClick={() => fetchAllProjects()} variant="outline">
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-8 w-full ">
       {/* Welcome Header */}
@@ -370,7 +343,7 @@ export default function DashboardPage() {
                           <div className="flex -space-x-2">
                             {project.members.slice(0, 3).map((member) => (
                               <Avatar
-                                key={member.id}
+                                key={member._id}
                                 className="h-6 w-6 border-2 border-white dark:border-gray-800"
                               >
                                 <AvatarImage
@@ -405,60 +378,6 @@ export default function DashboardPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Recent Activity */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-green-600" />
-                Recent Activity
-              </CardTitle>
-              <CardDescription>Latest team updates</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors duration-200"
-                >
-                  <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                    <AvatarImage
-                      src={activity.user.avatar || "/placeholder.svg"}
-                      alt={activity.user.name}
-                    />
-                    <AvatarFallback className="text-xs">
-                      {activity.user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center gap-1">
-                      {getActivityIcon(activity.type)}
-                      <p className="text-sm">
-                        <span className="font-medium">
-                          {activity.user.name}
-                        </span>{" "}
-                        <span className="text-muted-foreground">
-                          {activity.action}
-                        </span>{" "}
-                        <span className="font-medium">{activity.target}</span>
-                      </p>
-                    </div>
-                    {activity.project && (
-                      <p className="text-xs text-muted-foreground">
-                        {activity.project}
-                      </p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
           {/* Upcoming Deadlines */}
           <Card className="border-0 shadow-lg">
             <CardHeader>

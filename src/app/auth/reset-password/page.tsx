@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Zap, Shield, CheckCircle } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { useSearchParams } from 'next/navigation'
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
@@ -18,8 +20,19 @@ export default function ResetPasswordPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+
   const router = useRouter()
+  const {isLoading , resetPass } = useAuth();
+  const searchParams = useSearchParams()
+  const [token, setToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    const tokenFromUrl = searchParams.get('token')
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl)
+      // console.log('Token:', tokenFromUrl)
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,15 +43,12 @@ export default function ResetPasswordPage() {
       })
       return
     }
-
-    setIsLoading(true)
-
     try {
-      // TODO: Replace with actual API call
-      console.log("Password reset data:", formData)
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+     const data = {
+        token: token ?? "",
+        newPassword: formData.password
+      }
+      await resetPass(data);
 
       toast.success("Password reset successful", {
         description: "Your password has been updated successfully.",
@@ -50,9 +60,7 @@ export default function ResetPasswordPage() {
       toast.error("Password reset failed", {
         description: "Something went wrong. Please try again.",
       })
-    } finally {
-      setIsLoading(false)
-    }
+    } 
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

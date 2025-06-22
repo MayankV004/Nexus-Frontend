@@ -10,34 +10,37 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Link from "next/link"
 import { ArrowLeft, Mail, Zap, Shield, Clock } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  // const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const router = useRouter();
+  const {isLoading , forgotPass } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+  
 
     try {
-      // TODO: Replace with actual API call
       console.log("Password reset request for:", email)
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setIsSubmitted(true)
-      toast.success("Reset link sent", {
-        description: "Check your email for password reset instructions.",
-      })
+      const res = await forgotPass({email})
+      if(res.meta.requestStatus === 'fulfilled')
+      {
+        setIsSubmitted(true)
+        
+          toast.success("Reset link sent", {
+          description: "Check your email for password reset instructions.",
+        })
+        router.push('/auth/login')
+      }
     } catch (error) {
       toast.error("Failed to send reset link", {
         description: "Please try again later.",
       })
-    } finally {
-      setIsLoading(false)
-    }
+    } 
   }
 
   if (isSubmitted) {

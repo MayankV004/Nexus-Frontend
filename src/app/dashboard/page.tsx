@@ -141,7 +141,7 @@ export default function DashboardPage() {
   ];
 
     // Get recent projects (limit to 3)
-  const recentProjects = projects
+  const recentProjects = Array.from(projects)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 3)
     .map(project => ({

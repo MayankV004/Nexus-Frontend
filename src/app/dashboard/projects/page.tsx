@@ -11,82 +11,8 @@ import { FolderOpen, Users, AlertCircle, Search, Plus, MoreHorizontal, Calendar,
 import Link from "next/link"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { CreateProjectDialog } from "@/components/create-project-dialog"
+import { useProjects } from "@/hooks/useProject"
 
-// Mock data
-const projects = [
-  {
-    id: 1,
-    name: "E-commerce Platform",
-    description: "Modern online shopping platform with advanced features",
-    progress: 75,
-    issues: 12,
-    members: 5,
-    status: "In Progress",
-    priority: "High",
-    createdAt: "2024-01-15",
-    dueDate: "2024-03-15",
-  },
-  {
-    id: 2,
-    name: "Mobile App Redesign",
-    description: "Complete UI/UX overhaul for mobile application",
-    progress: 45,
-    issues: 8,
-    members: 3,
-    status: "In Progress",
-    priority: "Medium",
-    createdAt: "2024-02-01",
-    dueDate: "2024-04-01",
-  },
-  {
-    id: 3,
-    name: "API Integration",
-    description: "Third-party service integration and optimization",
-    progress: 90,
-    issues: 3,
-    members: 2,
-    status: "Review",
-    priority: "High",
-    createdAt: "2024-01-20",
-    dueDate: "2024-02-20",
-  },
-  {
-    id: 4,
-    name: "Database Migration",
-    description: "Migrate legacy database to new infrastructure",
-    progress: 25,
-    issues: 15,
-    members: 4,
-    status: "Planning",
-    priority: "Critical",
-    createdAt: "2024-02-10",
-    dueDate: "2024-05-10",
-  },
-  {
-    id: 5,
-    name: "Security Audit",
-    description: "Comprehensive security review and improvements",
-    progress: 60,
-    issues: 6,
-    members: 3,
-    status: "In Progress",
-    priority: "High",
-    createdAt: "2024-01-25",
-    dueDate: "2024-03-25",
-  },
-  {
-    id: 6,
-    name: "Documentation Update",
-    description: "Update all project documentation and guides",
-    progress: 100,
-    issues: 0,
-    members: 2,
-    status: "Completed",
-    priority: "Low",
-    createdAt: "2024-01-01",
-    dueDate: "2024-02-01",
-  },
-]
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -119,6 +45,9 @@ const getPriorityColor = (priority: string) => {
 }
 
 export default function ProjectsPage() {
+  const { projects} = useProjects()
+ 
+
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
@@ -133,7 +62,6 @@ export default function ProjectsPage() {
 
     return matchesSearch && matchesStatus && matchesPriority
   })
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -253,7 +181,7 @@ export default function ProjectsPage() {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map((project) => (
-          <Link key={project.id} href={`/dashboard/projects/${project.id}`}>
+          <Link key={project._id} href={`/dashboard/projects/${project._id}`}>
             <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 group">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
@@ -315,14 +243,14 @@ export default function ProjectsPage() {
                     </div>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-1" />
-                      {project.members} members
+                      {project.members.length} members
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center text-xs text-muted-foreground">
                   <Calendar className="h-3 w-3 mr-1" />
-                  Due: {new Date(project.dueDate).toLocaleDateString()}
+                  Due: {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : "No due date"}
                 </div>
               </CardContent>
             </Card>

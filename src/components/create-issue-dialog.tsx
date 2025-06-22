@@ -20,28 +20,23 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { X } from "lucide-react"
-
-interface ProjectMember {
-  id: number
-  name: string
-  email: string
-  role: string
-  avatar: string
-}
+import {type Member} from '@/store/slices/projectSlice'
+import { useIssue } from "@/hooks/useIssue"
+import type { CreateIssueFormData } from "@/store/slices/issueSlice"
 
 interface CreateIssueDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  projectId: number
-  projectMembers: ProjectMember[]
+  projectId: string
+  projectMembers: Member[]
 }
 
 const priorityOptions = [
-  { value: "low", label: "Low", color: "bg-green-100 text-green-800" },
-  { value: "medium", label: "Medium", color: "bg-yellow-100 text-yellow-800" },
-  { value: "high", label: "High", color: "bg-orange-100 text-orange-800" },
-  { value: "critical", label: "Critical", color: "bg-red-100 text-red-800" },
-]
+  { value: "Low", label: "Low", color: "bg-green-100 text-green-800" },
+  { value: "Medium", label: "Medium", color: "bg-yellow-100 text-yellow-800" },
+  { value: "High", label: "High", color: "bg-orange-100 text-orange-800" },
+  { value: "Critical", label: "Critical", color: "bg-red-100 text-red-800" },
+] as const
 
 const issueTypes = [
   { value: "bug", label: "Bug" },
@@ -68,49 +63,85 @@ export function CreateIssueDialog({ open, onOpenChange, projectId, projectMember
     title: "",
     description: "",
     type: "",
-    priority: "",
+    priority: "" as "Low" | "Medium" | "High" | "Critical" | "",
     assigneeId: "",
     labels: [] as string[],
   })
-  const [isLoading, setIsLoading] = useState(false)
+  
+  const { createNewIssue, isLoading } = useIssue()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    
+    if (!formData.title.trim()) {
+      toast.error("Title is required")
+      return
+    }
+
+    if (!formData.type) {
+      toast.error("Issue type is required")
+      return
+    }
+
+    if (!formData.priority) {
+      toast.error("Priority is required")
+      return
+    }
 
     try {
-      // TODO: Replace with actual API call
-      const issueData = {
-        ...formData,
+      // Find the selected assignee from project members
+      const selectedAssignee = formData.assigneeId 
+        ? projectMembers.find((member) => member._id?.toString() === formData.assigneeId)
+        : undefined
+
+      // Prepare the issue data according to CreateIssueFormData interface
+      const issueData: CreateIssueFormData = {
+        title: formData.title.trim(),
+        description: formData.description.trim() || undefined,
+        priority: formData.priority,
         projectId,
-        createdAt: new Date().toISOString(),
+        labels: formData.labels.length > 0 ? formData.labels : undefined,
+        assignee: selectedAssignee ? {
+          name: selectedAssignee.name,
+          email: selectedAssignee.email,
+          avatar: selectedAssignee.avatar
+        } : undefined,
+        status: "To Do", // Default status
       }
 
       console.log("Creating issue:", issueData)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Create the issue using Redux thunk
+      const result = await createNewIssue(issueData)
+      
+      // Check if the action was fulfilled
+      if (result.type === 'issues/createIssue/fulfilled') {
+        toast.success("Issue created successfully", {
+          description: "The issue has been added to the project.",
+        })
 
-      toast.success("Issue created successfully", {
-        description: "The issue has been added to the project.",
-      })
-
-      // Reset form and close dialog
-      setFormData({
-        title: "",
-        description: "",
-        type: "",
-        priority: "",
-        assigneeId: "",
-        labels: [],
-      })
-      onOpenChange(false)
+        // Reset form and close dialog
+        setFormData({
+          title: "",
+          description: "",
+          type: "",
+          priority: "",
+          assigneeId: "",
+          labels: [],
+        })
+        onOpenChange(false)
+      } else {
+        // Handle rejection case
+        const errorMessage = result.payload as string || "Failed to create issue"
+        toast.error("Failed to create issue", {
+          description: errorMessage,
+        })
+      }
     } catch (error) {
+      console.error("Error creating issue:", error)
       toast.error("Failed to create issue", {
         description: "Something went wrong. Please try again.",
       })
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -137,7 +168,7 @@ export function CreateIssueDialog({ open, onOpenChange, projectId, projectMember
     }))
   }
 
-  const selectedAssignee = projectMembers.find((member) => member.id.toString() === formData.assigneeId)
+  const selectedAssignee = projectMembers.find((member) => member._id?.toString() === formData.assigneeId)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -230,25 +261,27 @@ export function CreateIssueDialog({ open, onOpenChange, projectId, projectMember
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {projectMembers.map((member) => (
-                  <SelectItem key={member.id} value={member.id.toString()}>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name} />
-                        <AvatarFallback className="text-xs">
-                          {member.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{member.name}</div>
-                        <div className="text-xs text-gray-500">{member.role}</div>
+                {projectMembers
+                  .filter((member) => member._id !== undefined && member._id !== null)
+                  .map((member) => (
+                    <SelectItem key={member._id!.toString()} value={member._id!.toString()}>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name} />
+                          <AvatarFallback className="text-xs">
+                            {member.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{member.name}</div>
+                          <div className="text-xs text-gray-500">{member.role}</div>
+                        </div>
                       </div>
-                    </div>
-                  </SelectItem>
-                ))}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

@@ -45,28 +45,28 @@ const data = {
           url: "/dashboard/issues",
           icon: AlertCircle,
         },
-        {
-          title: "Team",
-          url: "/dashboard/team",
-          icon: Users,
-        },
+        // {
+        //   title: "Team",
+        //   url: "/dashboard/team",
+        //   icon: Users,
+        // },
       ],
     },
-    {
-      title: "Settings",
-      items: [
-        {
-          title: "Profile",
-          url: "/dashboard/profile",
-          icon: User,
-        },
-        {
-          title: "Preferences",
-          url: "/dashboard/settings",
-          icon: Settings,
-        },
-      ],
-    },
+    // {
+    //   title: "Settings",
+    //   items: [
+    //     {
+    //       title: "Profile",
+    //       url: "/dashboard/profile",
+    //       icon: User,
+    //     },
+    //     {
+    //       title: "Preferences",
+    //       url: "/dashboard/settings",
+    //       icon: Settings,
+    //     },
+    //   ],
+    // },
   ],
 }
 

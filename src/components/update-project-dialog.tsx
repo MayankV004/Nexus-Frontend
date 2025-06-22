@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,12 +25,12 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Calendar, FolderOpen, X } from "lucide-react";
 import { useProjects } from "@/hooks/useProject";
-import { useAuth } from "@/hooks/useAuth";
-import type { CreateProjectFormData } from "@/store/slices/projectSlice";
+import type { UpdateProjectFormData, Project } from "@/store/slices/projectSlice";
 
-interface CreateProjectDialogProps {
+interface UpdateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  project: Project;
 }
 
 const priorityOptions = [
@@ -58,6 +58,13 @@ const priorityOptions = [
   },
 ];
 
+const statusOptions = [
+  "Planning",
+  "In Progress",
+  "Review",
+  "Completed"
+];
+
 const projectTemplates = [
   "Web Development",
   "Mobile App",
@@ -69,66 +76,71 @@ const projectTemplates = [
   "Infrastructure",
 ];
 
-export function CreateProjectDialog({
+export function UpdateProjectDialog({
   open,
   onOpenChange,
-}: CreateProjectDialogProps) {
-  const { createNewProject, isLoading } = useProjects();
-  const { user } = useAuth();
+  project,
+}: UpdateProjectDialogProps) {
+  const { updateExistingProject, isLoading } = useProjects();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     priority: "",
+    status: "",
     dueDate: "",
     template: "",
     tags: [] as string[],
   });
 
+  // Initialize form data when project changes
+  useEffect(() => {
+    if (project) {
+      setFormData({
+        name: project.name || "",
+        description: project.description || "",
+        priority: project.priority || "",
+        status: project.status || "",
+        dueDate: project.dueDate ? new Date(project.dueDate).toISOString().split('T')[0] : "",
+        template: project.template || "",
+        tags: project.tags || [],
+      });
+    }
+  }, [project]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const projectData: CreateProjectFormData = {
+      const updateData: UpdateProjectFormData = {
         name: formData.name,
         description: formData.description || undefined,
         priority: formData.priority
           ? (formData.priority as "Low" | "Medium" | "High" | "Critical")
           : undefined,
+        status: formData.status
+          ? (formData.status as "Planning" | "In Progress" | "Review" | "Completed")
+          : undefined,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
         template: formData.template || undefined,
         tags: formData.tags.length > 0 ? formData.tags : undefined,
-        members: [], // Initialize with empty array or add member selection logic
       };
 
-      // Call the createNewProject function from useProjects hook
-      const result = await createNewProject(projectData);
+      const result = await updateExistingProject(project._id, updateData);
 
-      // Check if the result was successful
       if (result.meta.requestStatus === "fulfilled") {
-        toast.success("Project created successfully! 🎉", {
-          description: "Your new project has been set up and is ready to go.",
-        });
-
-        // Reset form and close dialog
-        setFormData({
-          name: "",
-          description: "",
-          priority: "",
-          dueDate: "",
-          template: "",
-          tags: [],
+        toast.success("Project updated successfully! 🎉", {
+          description: "Your project has been updated with the new changes.",
         });
         onOpenChange(false);
       } else {
-        // Handle the rejection case
         const errorMessage =
-          (result.payload as string) || "Failed to create project";
-        toast.error("Failed to create project", {
+          (result.payload as string) || "Failed to update project";
+        toast.error("Failed to update project", {
           description: errorMessage,
         });
       }
     } catch (error) {
-      toast.error("Failed to create project", {
+      toast.error("Failed to update project", {
         description: "Something went wrong. Please try again.",
       });
     }
@@ -166,10 +178,9 @@ export function CreateProjectDialog({
               <FolderOpen className="h-4 w-4" />
             </div>
             <div>
-              <DialogTitle className="text-xl">Create New Project</DialogTitle>
+              <DialogTitle className="text-xl">Update Project</DialogTitle>
               <DialogDescription>
-                Set up a new project to start tracking your work and
-                collaborating with your team.
+                Update your project details and settings.
               </DialogDescription>
             </div>
           </div>
@@ -234,19 +245,40 @@ export function CreateProjectDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate" className="text-sm font-medium">
-                Due Date
+              <Label htmlFor="status" className="text-sm font-medium">
+                Status *
               </Label>
-              <div className="relative">
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={(e) => handleInputChange("dueDate", e.target.value)}
-                  className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-                />
-                <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              </div>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => handleInputChange("status", value)}
+              >
+                <SelectTrigger className="transition-all duration-200">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dueDate" className="text-sm font-medium">
+              Due Date
+            </Label>
+            <div className="relative">
+              <Input
+                id="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => handleInputChange("dueDate", e.target.value)}
+                className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+              />
+              <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             </div>
           </div>
 
@@ -332,10 +364,10 @@ export function CreateProjectDialog({
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating...
+                  Updating...
                 </div>
               ) : (
-                "Create Project"
+                "Update Project"
               )}
             </Button>
           </DialogFooter>

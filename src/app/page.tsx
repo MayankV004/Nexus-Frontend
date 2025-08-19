@@ -306,7 +306,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>© 2024 Nexus. All rights reserved. Built with ❤️ for modern teams.</p>
+            <p>© 2025 Nexus. All rights reserved. Built with ❤️ for modern teams.</p>
           </div>
         </div>
       </footer>

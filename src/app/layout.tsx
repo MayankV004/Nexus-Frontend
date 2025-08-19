@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning>
         <ReduxProvider>
           <AuthProvider>
             <ThemeProvider
@@ -24,6 +24,7 @@ export default function RootLayout({
               defaultTheme="system"
               enableSystem
               disableTransitionOnChange
+              
             >     <main>
 
                 {children}      

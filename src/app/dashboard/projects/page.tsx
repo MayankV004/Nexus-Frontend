@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -45,7 +45,7 @@ const getPriorityColor = (priority: string) => {
 }
 
 export default function ProjectsPage() {
-  const { projects} = useProjects()
+  const { projects , fetchAllProjects,clearProjectError,  error } = useProjects()
  
 
   const [searchTerm, setSearchTerm] = useState("")
@@ -62,6 +62,19 @@ export default function ProjectsPage() {
 
     return matchesSearch && matchesStatus && matchesPriority
   })
+
+  useEffect(() => {
+      fetchAllProjects();
+    }, [fetchAllProjects]);
+  
+    // Clear error when component unmounts
+    useEffect(() => {
+      return () => {
+        if (error) {
+          clearProjectError();
+        }
+      };
+    }, [error, clearProjectError]);
   return (
     <div className="space-y-6">
       {/* Header */}

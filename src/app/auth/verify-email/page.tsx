@@ -21,7 +21,7 @@ export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
   const email = searchParams.get("email") || ""
 
-  const { isLoading , verifyUserEmail ,resendVerification } = useAuth()
+  const { isLoading , verifyUserEmail , resendVerification } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +44,7 @@ export default function VerifyEmailPage() {
         toast.success("Email verified successfully", {
         description: "Your account has been activated.",
       })
+
       router.push("/dashboard")
 
       }

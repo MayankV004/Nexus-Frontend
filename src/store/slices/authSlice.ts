@@ -337,11 +337,14 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(verifyEmail.fulfilled, (state) => {
+      .addCase(verifyEmail.fulfilled, (state,action) => {
         state.isLoading = false;
         if (state.user) {
           state.user.isEmailVerified = true;
         }
+        state.user = action.payload.data.user;
+        state.accessToken = action.payload.tokens.accessToken;
+        state.refreshToken = action.payload.tokens.refreshToken;
         state.isAuthenticated = true;
         state.error = null;
       })

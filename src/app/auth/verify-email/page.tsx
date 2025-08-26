@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,11 +17,16 @@ export default function VerifyEmailPage() {
   const [otp, setOtp] = useState("")
   // const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
-  const router = useRouter()
+  const router = useRouter();
   const searchParams = useSearchParams()
   const email = searchParams.get("email") || ""
 
-  const { isLoading , verifyUserEmail , resendVerification } = useAuth()
+  const { isLoading , verifyUserEmail , resendVerification , clearAuthError, error } = useAuth();
+  useEffect(() => {
+      if (error) {
+        clearAuthError();
+      }
+    }, [otp , clearAuthError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

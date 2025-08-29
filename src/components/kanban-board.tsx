@@ -225,7 +225,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       (member) =>
         member._id === currentAssignee || member.email === currentAssignee
     );
-    setSelectedAssigneeEmail(currentMember?.email || "");
+    setSelectedAssigneeEmail(issue.assignee?.email || "");
     setIsAssignDialogOpen(true);
   };
 
@@ -514,7 +514,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                   {projectMembers.map((member) => (
                     <SelectItem
                       key={member._id || member.email}
-                      value={member._id || member.email}
+                      value={member.email}
                     >
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">

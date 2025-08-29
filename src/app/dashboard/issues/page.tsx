@@ -62,11 +62,11 @@ const getPriorityColor = (priority: string) => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "Open":
+    case "To Do":
       return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
     case "In Progress":
       return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
-    case "Review":
+    case "In Review":
       return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
     case "Done":
       return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
@@ -116,6 +116,7 @@ export default function IssuesPage() {
     const fetchAllIssueOfUser = async () => {
       try {
         const response = await axios.get("/api/v1/issues/");
+        console.log(response)
         if (!response.data.success) {
           toast.error("Failed to fetch user Issues");
           return;

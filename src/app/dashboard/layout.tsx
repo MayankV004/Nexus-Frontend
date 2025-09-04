@@ -17,6 +17,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/user-nav"
 import { usePathname } from "next/navigation"
 import { SidebarProvider } from "@/components/ui/sidebar"
+import { useProjects } from "@/hooks/useProject"
 
 export default function DashboardLayout({
   children,
@@ -24,16 +25,18 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const {getProjectByIdFromState} = useProjects()
 
   const getBreadcrumbs = () => {
     const segments = pathname.split("/").filter(Boolean)
-    // console.log(segments)
+    console.log("segments: ",segments)
     const breadcrumbs = []
 
     if (segments[1] === "projects") {
       breadcrumbs.push({ name: "Projects", href: "/dashboard/projects" })
       if (segments[2] && segments[2] !== "new") {
-        breadcrumbs.push({ name: `Project #${segments[2]}`, href: `/dashboard/projects/${segments[2]}` })
+        const project = getProjectByIdFromState(segments[2])
+        breadcrumbs.push({ name: `${project?.name}`, href: `/dashboard/projects/${segments[2]}` })
       }
     } else if (segments[1] === "issues") {
       breadcrumbs.push({ name: "Issues", href: "/dashboard/issues" })
@@ -42,12 +45,13 @@ export default function DashboardLayout({
     } else {
       breadcrumbs.push({ name: "Dashboard", href: "/dashboard" })
     }
+    console.log("function : ", breadcrumbs)
 
     return breadcrumbs
   }
 
   const breadcrumbs = getBreadcrumbs()
-  // console.log(breadcrumbs)
+  console.log("Second : ",breadcrumbs)
   return (
     <SidebarProvider>
     <div className="flex min-h-screen w-full ">

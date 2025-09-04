@@ -1,16 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, CheckCircle, Users, Zap, Shield, BarChart3, Sparkles, Star } from "lucide-react"
+import { ArrowRight, CheckCircle, Users, Zap,BarChart3, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { Metadata } from "next"
-import { generateSEO } from "@/lib/seo-utils"
 
-export const metadata: Metadata = generateSEO({
-  title: "Home",
-  description: "Transform your team's productivity with Nexus - the ultimate project management and issue tracking platform",
-  keywords: ["project management", "issue tracking", "team collaboration", "productivity", "kanban", "task management"],
-})
 
 export default function LandingPage() {
   return (

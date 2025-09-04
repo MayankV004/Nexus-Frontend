@@ -17,7 +17,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { UserNav } from "@/components/user-nav"
 import { usePathname } from "next/navigation"
 import { SidebarProvider } from "@/components/ui/sidebar"
-import { serialize } from "v8"
 
 export default function DashboardLayout({
   children,

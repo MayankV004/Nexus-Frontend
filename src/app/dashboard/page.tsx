@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Card,
   CardContent,
@@ -21,8 +20,6 @@ import {
   Plus,
   ArrowRight,
   Calendar,
-  Activity,
-  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,20 +53,20 @@ const getPriorityColor = (priority: string) => {
   }
 };
 
-const getActivityIcon = (type: string) => {
-  switch (type) {
-    case "issue":
-      return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-    case "project":
-      return <FolderOpen className="h-4 w-4 text-blue-600" />;
-    case "comment":
-      return <AlertCircle className="h-4 w-4 text-orange-600" />;
-    case "update":
-      return <Activity className="h-4 w-4 text-purple-600" />;
-    default:
-      return <Clock className="h-4 w-4 text-gray-600" />;
-  }
-};
+// const getActivityIcon = (type: string) => {
+//   switch (type) {
+//     case "issue":
+//       return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+//     case "project":
+//       return <FolderOpen className="h-4 w-4 text-blue-600" />;
+//     case "comment":
+//       return <AlertCircle className="h-4 w-4 text-orange-600" />;
+//     case "update":
+//       return <Activity className="h-4 w-4 text-purple-600" />;
+//     default:
+//       return <Clock className="h-4 w-4 text-gray-600" />;
+//   }
+// };
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -80,7 +77,6 @@ export default function DashboardPage() {
     totalCount,
     fetchAllProjects,
     getProjectsByStatus,
-    getOverdueProjects,
     clearProjectError 
   } = useProjects();
   // Fetch projects on component mount
@@ -213,7 +209,7 @@ export default function DashboardPage() {
               Welcome back, {user?.name}!
             </h1>
             <p className="text-muted-foreground">
-              Here's what's happening with your projects today.
+              Here&apos;s what&apos;s happening with your projects today.
             </p>
           </div>
         </div>
@@ -386,7 +382,7 @@ export default function DashboardPage() {
                 Upcoming Deadlines
               </CardTitle>
               <CardDescription>
-                Don't miss these important dates
+                Don&apos;t miss these important dates
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">

@@ -121,11 +121,17 @@ export default function IssuesPage() {
           toast.error("Failed to fetch user Issues");
           return;
         }
-        console.log(response.data);
+        // console.log(response.data);
         setIssues(response.data.data); // Use response.data.data based on your API structure
-      } catch (error: any) {
-        toast.error("Error in fetching issues");
-        setIssues([]);
+      } catch (error: unknown) {
+        if(error instanceof Error){
+            toast.error(error.message);
+          setIssues([]);
+        }else{
+          toast.error("An unexpected error occurred");
+          setIssues([]);
+        }
+        
       }
     };
     fetchAllIssueOfUser();

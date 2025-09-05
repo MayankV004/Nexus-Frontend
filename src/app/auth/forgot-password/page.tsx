@@ -1,47 +1,55 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import Link from "next/link"
-import { ArrowLeft, Mail, Zap, Shield, Clock } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import Link from "next/link";
+import { ArrowLeft, Mail, Zap, Shield, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
   // const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
-  const {isLoading , forgotPass } = useAuth()
+  const { isLoading, forgotPass } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-  
+    e.preventDefault();
 
     try {
-      console.log("Password reset request for:", email)
-      const res = await forgotPass({email})
-      if(res.meta.requestStatus === 'fulfilled')
-      {
-        setIsSubmitted(true)
-        
-          toast.success("Reset link sent", {
+      console.log("Password reset request for:", email);
+      const res = await forgotPass({ email });
+      if (res.meta.requestStatus === "fulfilled") {
+        setIsSubmitted(true);
+
+        toast.success("Reset link sent", {
           description: "Check your email for password reset instructions.",
-        })
-        router.push('/auth/login')
+        });
+        router.push("/auth/login");
       }
-    } catch (error) {
-      toast.error("Failed to send reset link", {
-        description: "Please try again later.",
-      })
-    } 
-  }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
+          description: "Please try again later.",
+        });
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    }
+  };
 
   if (isSubmitted) {
     return (
@@ -61,7 +69,9 @@ export default function ForgotPasswordPage() {
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
                     Nexus
                   </h1>
-                  <p className="text-sm text-muted-foreground">Project Management</p>
+                  <p className="text-sm text-muted-foreground">
+                    Project Management
+                  </p>
                 </div>
               </div>
 
@@ -70,7 +80,8 @@ export default function ForgotPasswordPage() {
                   Check your email
                 </h2>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  We've sent password reset instructions to <span className="font-medium text-foreground">{email}</span>
+                  We&apos;ve sent password reset instructions to{" "}
+                  <span className="font-medium text-foreground">{email}</span>
                 </p>
               </div>
 
@@ -79,7 +90,9 @@ export default function ForgotPasswordPage() {
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-blue-600 flex items-center justify-center">
                     <Mail className="text-white h-5 w-5" />
                   </div>
-                  <span className="font-semibold text-green-900 dark:text-green-100">Email sent successfully</span>
+                  <span className="font-semibold text-green-900 dark:text-green-100">
+                    Email sent successfully
+                  </span>
                 </div>
                 <p className="text-sm text-green-700 dark:text-green-300 mb-3">
                   Follow the instructions in the email to reset your password.
@@ -113,9 +126,11 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+                  <CardTitle className="text-2xl font-bold">
+                    Check your email
+                  </CardTitle>
                   <CardDescription className="text-base">
-                    We've sent password reset instructions to {email}
+                    We&apos;ve sent password reset instructions to {email}
                   </CardDescription>
                 </div>
               </CardHeader>
@@ -123,7 +138,8 @@ export default function ForgotPasswordPage() {
               <CardContent className="space-y-6">
                 <div className="text-center space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Didn't receive the email? Check your spam folder or try again.
+                    Didn&apos;t receive the email? Check your spam folder or try
+                    again.
                   </p>
                   <Button
                     variant="outline"
@@ -133,7 +149,10 @@ export default function ForgotPasswordPage() {
                     Try again
                   </Button>
                   <Link href="/auth/login">
-                    <Button variant="ghost" className="w-full hover:scale-105 transition-transform duration-200">
+                    <Button
+                      variant="ghost"
+                      className="w-full hover:scale-105 transition-transform duration-200"
+                    >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Back to login
                     </Button>
@@ -144,7 +163,7 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -164,7 +183,9 @@ export default function ForgotPasswordPage() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
                   Nexus
                 </h1>
-                <p className="text-sm text-muted-foreground">Project Management</p>
+                <p className="text-sm text-muted-foreground">
+                  Project Management
+                </p>
               </div>
             </div>
 
@@ -173,7 +194,8 @@ export default function ForgotPasswordPage() {
                 Forgot your password?
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                No worries! Enter your email address and we'll send you a link to reset your password.
+                No worries! Enter your email address and we&apos;ll send you a
+                link to reset your password.
               </p>
             </div>
 
@@ -182,13 +204,17 @@ export default function ForgotPasswordPage() {
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <Shield className="text-white h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">Secure password reset</span>
+                <span className="text-sm font-medium">
+                  Secure password reset
+                </span>
               </div>
               <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
                 <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <Clock className="text-white h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">Link expires in 1 hour</span>
+                <span className="text-sm font-medium">
+                  Link expires in 1 hour
+                </span>
               </div>
             </div>
           </div>
@@ -209,9 +235,12 @@ export default function ForgotPasswordPage() {
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="text-2xl font-bold">Forgot your password?</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                  Forgot your password?
+                </CardTitle>
                 <CardDescription className="text-base">
-                  Enter your email address and we'll send you a link to reset your password
+                  Enter your email address and we&apos;ll send you a link to
+                  reset your password
                 </CardDescription>
               </div>
             </CardHeader>
@@ -252,7 +281,10 @@ export default function ForgotPasswordPage() {
 
               <div className="text-center space-y-4">
                 <Link href="/auth/login">
-                  <Button variant="ghost" className="text-sm hover:scale-105 transition-transform duration-200">
+                  <Button
+                    variant="ghost"
+                    className="text-sm hover:scale-105 transition-transform duration-200"
+                  >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to login
                   </Button>
@@ -263,5 +295,5 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

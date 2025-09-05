@@ -1,98 +1,118 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import { useRouter , useSearchParams } from "next/navigation"
-import { Mail, Zap, ArrowLeft, CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Mail, Zap, ArrowLeft, CheckCircle } from "lucide-react";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function VerifyEmailPage() {
-  const [otp, setOtp] = useState("")
+  const [otp, setOtp] = useState("");
   // const [isLoading, setIsLoading] = useState(false)
-  const [isResending, setIsResending] = useState(false)
+  const [isResending, setIsResending] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams()
-  const email = searchParams.get("email") || ""
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
 
-  const { isLoading , verifyUserEmail , resendVerification , clearAuthError, error } = useAuth();
+  const {
+    isLoading,
+    verifyUserEmail,
+    resendVerification,
+    clearAuthError,
+    error,
+  } = useAuth();
   useEffect(() => {
-      if (error) {
-        clearAuthError();
-      }
-    }, [otp , clearAuthError]);
+    if (error) {
+      clearAuthError();
+    }
+  }, [otp, clearAuthError, error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(!email ){
+    if (!email) {
       toast.error("Email is required", {
         description: "Please provide a valid email address.",
-      })
+      });
       return;
     }
     try {
       if (otp.length !== 6) {
         toast.error("Invalid OTP", {
           description: "Please enter a valid 6-digit OTP.",
-        })
+        });
         return;
       }
-      const result = await verifyUserEmail({otp , email})
-      if(result.meta.requestStatus === "fulfilled")
-      { 
+      const result = await verifyUserEmail({ otp, email });
+      if (result.meta.requestStatus === "fulfilled") {
         toast.success("Email verified successfully", {
-        description: "Your account has been activated.",
-      })
+          description: "Your account has been activated.",
+        });
 
-      router.push("/dashboard")
-
+        router.push("/dashboard");
       }
-      
-    } catch (error) {
-      toast.error("Verification failed", {
-        description: "Invalid OTP. Please try again.",
-      })
-    } 
-  }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
+          description: "Invalid OTP. Please try again.",
+        });
+      } else {
+        toast.error("Verification failed", {
+          description: "Invalid OTP. Please try again.",
+        });
+      }
+    }
+  };
 
   const handleResendOTP = async () => {
-    setIsResending(true)
+    setIsResending(true);
 
     try {
-      
       if (!email) {
         toast.error("Email is required", {
           description: "Please provide a valid email address.",
-        })
-        return
+        });
+        return;
       }
-      const result = await resendVerification(email)
+      const result = await resendVerification(email);
       if (result.meta.requestStatus === "fulfilled") {
-        setOtp("") // Clear the OTP input field
+        setOtp(""); // Clear the OTP input field
       }
       if (result.payload.data?.email) {
         toast.success("OTP resent successfully", {
           description: `A new verification code has been sent to ${result.payload.data.email}.`,
-        })
+        });
       } else {
         toast.error("Failed to resend OTP", {
           description: "Please try again later.",
-        })
+        });
       }
-    } catch (error:any) {
-      toast.error("Failed to resend OTP", {
-        description: "Please try again later.",
-      })
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
+          description: "Please try again later.",
+        });
+      } else {
+        toast.error("Failed to resend OTP", {
+          description: "Please try again later.",
+        });
+      }
     } finally {
-      setIsResending(false)
+      setIsResending(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50 dark:from-gray-950 dark:via-gray-900 dark:to-green-950 flex items-center justify-center p-4">
@@ -111,7 +131,9 @@ export default function VerifyEmailPage() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
                   Nexus
                 </h1>
-                <p className="text-sm text-muted-foreground">Project Management</p>
+                <p className="text-sm text-muted-foreground">
+                  Project Management
+                </p>
               </div>
             </div>
 
@@ -120,8 +142,9 @@ export default function VerifyEmailPage() {
                 Almost there!
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We've sent a verification code to your email. Enter it below to activate your account and start your
-                journey with Nexus.
+                We&apos;ve sent a verification code to your email. Enter it
+                below to activate your account and start your journey with
+                Nexus.
               </p>
             </div>
 
@@ -130,10 +153,13 @@ export default function VerifyEmailPage() {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-blue-600 flex items-center justify-center">
                   <Mail className="text-white h-5 w-5" />
                 </div>
-                <span className="font-semibold text-green-900 dark:text-green-100">Check your inbox</span>
+                <span className="font-semibold text-green-900 dark:text-green-100">
+                  Check your inbox
+                </span>
               </div>
               <p className="text-sm text-green-700 dark:text-green-300 mb-3">
-                We've sent a 6-digit verification code to your email address.
+                We&apos;ve sent a 6-digit verification code to your email
+                address.
               </p>
               <div className="flex items-center space-x-2 text-xs text-green-600 dark:text-green-400">
                 <CheckCircle className="h-3 w-3" />
@@ -164,7 +190,9 @@ export default function VerifyEmailPage() {
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="text-2xl font-bold">Verify your email</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                  Verify your email
+                </CardTitle>
                 <CardDescription className="text-base">
                   Enter the 6-digit code we sent to your email address
                 </CardDescription>
@@ -207,7 +235,9 @@ export default function VerifyEmailPage() {
               </form>
 
               <div className="text-center space-y-4">
-                <p className="text-sm text-muted-foreground">Didn't receive the code?</p>
+                <p className="text-sm text-muted-foreground">
+                  Didn&apos;t receive the code?
+                </p>
                 <Button
                   variant="ghost"
                   onClick={handleResendOTP}
@@ -225,7 +255,10 @@ export default function VerifyEmailPage() {
                 </Button>
 
                 <Link href="/auth/login">
-                  <Button variant="ghost" className="text-sm hover:scale-105 transition-transform duration-200">
+                  <Button
+                    variant="ghost"
+                    className="text-sm hover:scale-105 transition-transform duration-200"
+                  >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to login
                   </Button>
@@ -236,5 +269,5 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

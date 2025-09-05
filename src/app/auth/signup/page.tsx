@@ -54,7 +54,7 @@ export default function SignupPage() {
     if (error) {
       clearAuthError();
     }
-  }, [formData, clearAuthError]);
+  }, [formData, clearAuthError , error]);
 
   useEffect(() => {
     if (error) {
@@ -66,7 +66,7 @@ export default function SignupPage() {
     if (isAuthenticated) {
       clearAuth();
     }
-  }, []);
+  }, [clearAuth, isAuthenticated]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,10 +86,17 @@ export default function SignupPage() {
         // Redirect to email verification
         router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
       }
-    } catch (error: any) {
-      toast.error("Signup failed", {
+    } catch (error: unknown) {
+      if(error instanceof Error) {
+          toast.error(error.message, {
         description: "Something went wrong. Please try again.",
       });
+      }else{
+        toast.error("Signup failed", {
+          description: "An unexpected error occurred. Please try again.",
+        });
+      }
+      
     }
   };
 

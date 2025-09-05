@@ -10,11 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Loader2 } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export function UserNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,8 +29,12 @@ export function UserNav() {
       await logout();
       toast.success("Logged out successfully");
       router.push("/");
-    } catch (error) {
-      toast.error("Failed to logout");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to logout");
+      }
     } finally {
       setLogout(false);
     }
@@ -45,7 +48,9 @@ export function UserNav() {
         try {
           await fetchUserProfile();
         } catch (error: any) {
-          toast.error(error?.response?.data?.message || "Failed to load profile");
+          toast.error(
+            error?.response?.data?.message || "Failed to load profile"
+          );
         } finally {
           setIsLoadingProfile(false);
         }
@@ -64,7 +69,11 @@ export function UserNav() {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <div className="z-10">
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
             <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
               {isLoadingProfile ? (
                 <Loader2 className="w-3 h-3 text-white animate-spin" />
@@ -87,8 +96,12 @@ export function UserNav() {
                 {user?.email || "Loading email..."}
               </span>
               {user?.isEmailVerified !== undefined && (
-                <span className={`text-xs ${user.isEmailVerified ? 'text-green-600' : 'text-orange-600'}`}>
-                  {user.isEmailVerified ? '✓ Verified' : '⚠ Unverified'}
+                <span
+                  className={`text-xs ${
+                    user.isEmailVerified ? "text-green-600" : "text-orange-600"
+                  }`}
+                >
+                  {user.isEmailVerified ? "✓ Verified" : "⚠ Unverified"}
                 </span>
               )}
             </div>

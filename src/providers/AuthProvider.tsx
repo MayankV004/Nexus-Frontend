@@ -8,7 +8,7 @@ interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { initializeAuth, isAuthenticated } = useAuth();
+  const { initializeAuth } = useAuth();
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {

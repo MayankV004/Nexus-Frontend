@@ -25,7 +25,6 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Calendar, FolderOpen, X } from "lucide-react";
 import { useProjects } from "@/hooks/useProject";
-import { useAuth } from "@/hooks/useAuth";
 import type { CreateProjectFormData } from "@/store/slices/projectSlice";
 
 interface CreateProjectDialogProps {
@@ -74,7 +73,6 @@ export function CreateProjectDialog({
   onOpenChange,
 }: CreateProjectDialogProps) {
   const { createNewProject, isLoading } = useProjects();
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -127,10 +125,16 @@ export function CreateProjectDialog({
           description: errorMessage,
         });
       }
-    } catch (error) {
-      toast.error("Failed to create project", {
-        description: "Something went wrong. Please try again.",
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
+          description: "Something went wrong. Please try again.",
+        });
+      } else {
+        toast.error("Failed to create project", {
+          description: "Something went wrong. Please try again.",
+        });
+      }
     }
   };
 

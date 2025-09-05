@@ -34,7 +34,7 @@ export default function LoginPage() {
     if (error) {
       clearAuthError();
     }
-  }, [formData, clearAuthError]);
+  }, [formData, clearAuthError , error]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -63,10 +63,17 @@ export default function LoginPage() {
           router.push("/dashboard");
         }
       }
-    } catch (error: any) {
-      toast.error("Login failed", {
+    } catch (error : unknown) {
+      if(error instanceof Error){
+          toast.error(error.message, {
         description: "Please check your credentials and try again.",
       });
+      }else{
+       toast.error("Login failed", {
+        description: "Please check your credentials and try again.",
+      });
+      }
+      
     }
   };
 
@@ -241,7 +248,7 @@ export default function LoginPage() {
 
               <div className="text-center space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Don't have an account?{" "}
+                  Don&apso;t have an account?{" "}
                   <Link
                     href="/auth/signup"
                     className="text-blue-600 hover:text-blue-500 font-medium transition-colors duration-200"

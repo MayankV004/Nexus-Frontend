@@ -1,74 +1,86 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Zap, Shield, CheckCircle } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Zap, Shield, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useSearchParams } from "next/navigation";
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const router = useRouter()
-  const {isLoading , resetPass } = useAuth();
-  const searchParams = useSearchParams()
-  const [token, setToken] = useState<string | null>(null)
+  const router = useRouter();
+  const { isLoading, resetPass } = useAuth();
+  const searchParams = useSearchParams();
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const tokenFromUrl = searchParams.get('token')
+    const tokenFromUrl = searchParams.get("token");
     if (tokenFromUrl) {
-      setToken(tokenFromUrl)
+      setToken(tokenFromUrl);
       // console.log('Token:', tokenFromUrl)
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Password mismatch", {
         description: "Passwords do not match. Please try again.",
-      })
-      return
+      });
+      return;
     }
     try {
-     const data = {
+      const data = {
         token: token ?? "",
-        newPassword: formData.password
-      }
+        newPassword: formData.password,
+      };
       await resetPass(data);
 
       toast.success("Password reset successful", {
         description: "Your password has been updated successfully.",
-      })
+      });
 
       // Redirect to login
-      router.push("/auth/login")
-    } catch (error) {
-      toast.error("Password reset failed", {
-        description: "Something went wrong. Please try again.",
-      })
-    } 
-  }
+      router.push("/auth/login");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message, {
+          description: "Something went wrong. Please try again.",
+        });
+      } else {
+        toast.error("Signup Failed", {
+          description: "Please try again.",
+        });
+      }
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50 dark:from-gray-950 dark:via-gray-900 dark:to-red-950 flex items-center justify-center p-4">
@@ -87,7 +99,9 @@ export default function ResetPasswordPage() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
                   Nexus
                 </h1>
-                <p className="text-sm text-muted-foreground">Project Management</p>
+                <p className="text-sm text-muted-foreground">
+                  Project Management
+                </p>
               </div>
             </div>
 
@@ -96,7 +110,8 @@ export default function ResetPasswordPage() {
                 Create a new password
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Choose a strong password to secure your account. Make sure it's something you'll remember.
+                Choose a strong password to secure your account. Make sure
+                it&apso;s something you&apos;ll remember.
               </p>
             </div>
 
@@ -105,13 +120,17 @@ export default function ResetPasswordPage() {
                 <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                   <CheckCircle className="text-white h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">At least 8 characters</span>
+                <span className="text-sm font-medium">
+                  At least 8 characters
+                </span>
               </div>
               <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <Shield className="text-white h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">Mix of letters and numbers</span>
+                <span className="text-sm font-medium">
+                  Mix of letters and numbers
+                </span>
               </div>
             </div>
           </div>
@@ -132,8 +151,12 @@ export default function ResetPasswordPage() {
               </div>
 
               <div className="space-y-2">
-                <CardTitle className="text-2xl font-bold">Reset your password</CardTitle>
-                <CardDescription className="text-base">Enter your new password below</CardDescription>
+                <CardTitle className="text-2xl font-bold">
+                  Reset your password
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Enter your new password below
+                </CardDescription>
               </div>
             </CardHeader>
 
@@ -161,13 +184,20 @@ export default function ResetPasswordPage() {
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium"
+                  >
                     Confirm New Password
                   </Label>
                   <div className="relative">
@@ -186,9 +216,15 @@ export default function ResetPasswordPage() {
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -213,5 +249,5 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -44,7 +44,7 @@ export const useAuth = () => {
             refreshToken: refreshTokenStored
           }
         }));
-      } catch (error) {
+      } catch{
         // If profile fetch fails, try to refresh token
         try {
           const refreshResult = await dispatch(refreshToken());
@@ -53,7 +53,7 @@ export const useAuth = () => {
             const profileResponse = await axios.get('/api/v1/user/profile');
             dispatch(updateUser(profileResponse.data.data));
           }
-        } catch (refreshError) {
+        } catch {
           // If refresh also fails, clear everything
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');

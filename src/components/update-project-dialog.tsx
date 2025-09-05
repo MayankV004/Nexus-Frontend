@@ -139,10 +139,17 @@ export function UpdateProjectDialog({
           description: errorMessage,
         });
       }
-    } catch (error) {
-      toast.error("Failed to update project", {
+    } catch (error:unknown) {
+      if(error instanceof Error) {
+         toast.error(error.message, {
+        description: "Something went wrong. Please try again.",
+      }); 
+      }else{
+         toast.error("Failed to update project", {
         description: "Something went wrong. Please try again.",
       });
+      }
+     
     }
   };
 

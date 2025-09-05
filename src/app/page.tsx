@@ -57,7 +57,7 @@ export default function LandingPage() {
             </span>
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Team's Workflow
+              Team&apos;s Workflow
             </span>
           </h1>
           <p className="text-xl text-muted-foreground mb-10 leading-relaxed max-w-3xl mx-auto">

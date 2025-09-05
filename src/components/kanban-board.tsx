@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Plus, MoreHorizontal, MessageSquare, Paperclip } from "lucide-react";
+import { Plus, MoreHorizontal, } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +19,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,6 +32,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { Trash2, Edit, UserPlus } from "lucide-react";
 import { useProjects } from "@/hooks/useProject";
+
+interface EditForm {
+  title: string;
+  description: string;
+  priority: string;
+  status: string;
+}
+
 
 const getPriorityColor = (priority: string) => {
   switch (priority) {
@@ -79,9 +85,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
   const [editingIssue, setEditingIssue] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState<any>(false);
   const [assigningIssue, setAssigningIssue] = useState<any>(null);
-  const [editForm, setEditForm] = useState({
+  const [editForm, setEditForm] = useState<EditForm>({
     title: "",
     description: "",
     priority: "",

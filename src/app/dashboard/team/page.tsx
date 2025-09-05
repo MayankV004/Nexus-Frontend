@@ -185,8 +185,12 @@ export default function TeamPage() {
 
       setInviteEmail("")
       setIsInviteDialogOpen(false)
-    } catch (error) {
-      toast.error("Failed to send invite")
+    } catch (error: unknown) {
+      if(error instanceof Error){
+        toast.error(error.message)
+      }else{
+        toast.error("Failed to send invite")
+      } 
     }
   }
 
@@ -206,8 +210,13 @@ export default function TeamPage() {
 
       setSearchUsername("")
       setIsAddMemberDialogOpen(false)
-    } catch (error) {
-      toast.error("User not found")
+    } catch (error:unknown) {
+      if(error instanceof Error) {
+        toast.error(error.message)
+      }else{
+        toast.error("Failed to find user")
+      }
+
     }
   }
 

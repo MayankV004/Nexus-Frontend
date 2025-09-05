@@ -38,25 +38,25 @@ import { useProjects } from "@/hooks/useProject";
 const getPriorityColor = (priority: string) => {
   switch (priority) {
     case "Critical":
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
     case "High":
-      return "bg-orange-100 text-orange-800 border-orange-200";
+      return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800";
     case "Medium":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800";
     case "Low":
-      return "bg-green-100 text-green-800 border-green-200";
+      return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700";
   }
 };
 
 const getLabelColor = (label: string) => {
   const colors = [
-    "bg-blue-100 text-blue-800",
-    "bg-purple-100 text-purple-800",
-    "bg-pink-100 text-pink-800",
-    "bg-indigo-100 text-indigo-800",
-    "bg-cyan-100 text-cyan-800",
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+    "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
+    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
   ];
   return colors[label.length % colors.length];
 };
@@ -109,6 +109,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       fetchProjectById(projectId);
     }
   }, [projectId, currentProject, fetchProjectById]);
+  
   // Transform issues into columns based on status
   const columns = [
     {
@@ -179,6 +180,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     setDraggedIssue(null);
     setDraggedFromColumn(null);
   };
+  
   const handleEditIssue = (issue: any) => {
     setEditingIssue(issue);
     setEditForm({
@@ -235,7 +237,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     try {
       let assigneeData = null;
 
-      if (selectedAssigneeEmail) {
+      if (selectedAssigneeEmail && selectedAssigneeEmail !== 'unassigned') {
         const selectedMember = projectMembers.find(
           (member) => member.email === selectedAssigneeEmail
         );
@@ -276,8 +278,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading issues...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent dark:border-blue-400 dark:border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading issues...</p>
         </div>
       </div>
     );
@@ -293,13 +295,13 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           onDrop={(e) => handleDrop(e, column.id)}
         >
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               {column.title}
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs dark:bg-gray-700 dark:text-gray-300">
                 {column.issues.length}
               </Badge>
             </h3>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="dark:hover:bg-gray-800">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -307,14 +309,14 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           <div className="space-y-3 min-h-[400px]">
             {column.issues.map((issue) => (
               <Card
-                key={issue._id} // Use _id instead of id
-                className="cursor-move hover:shadow-md transition-shadow"
+                key={issue._id}
+                className="cursor-move hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:shadow-lg"
                 draggable
                 onDragStart={() => handleDragStart(issue, column.id)}
               >
-                <CardHeader className="pb-1">
+                <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-sm font-medium leading-tight">
+                    <CardTitle className="text-sm font-medium leading-tight dark:text-gray-100">
                       {issue.title}
                     </CardTitle>
                     <DropdownMenu>
@@ -322,24 +324,28 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-6 w-6 p-0"
+                          className="h-6 w-6 p-0 dark:hover:bg-gray-700"
                         >
                           <MoreHorizontal className="h-3 w-3" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
                         <DropdownMenuItem
                           onClick={() => handleEditIssue(issue)}
+                          className="dark:hover:bg-gray-700"
                         >
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Issue
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleAssignTo(issue)}>
+                        <DropdownMenuItem 
+                          onClick={() => handleAssignTo(issue)}
+                          className="dark:hover:bg-gray-700"
+                        >
                           <UserPlus className="h-4 w-4 mr-2" />
                           Assign to...
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-red-600 dark:text-red-400 dark:hover:bg-gray-700"
                           onClick={() => handleDeleteIssue(issue)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
@@ -350,24 +356,17 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-xs text-gray-600 line-clamp-2">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
                     {issue.description}
                   </p>
 
                   <div className="flex items-center gap-1">
                     <Badge
                       variant="outline"
-                      className={`text-xs ${getPriorityColor(issue.status)}`}
-                    >
-                      {issue.status}
-                    </Badge>
-                    <Badge
-                      variant="outline"
                       className={`text-xs ${getPriorityColor(issue.priority)}`}
                     >
                       {issue.priority}
                     </Badge>
-                    <p className="text-red-50">{issue?.assignee?.name}</p>
                   </div>
 
                   {issue.labels && issue.labels.length > 0 && (
@@ -384,39 +383,42 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {/* Remove comments and attachments for now since they're not in your Issue interface */}
-                    </div>
-                    {issue.assignee && (
+                  {/* Assignee positioned at bottom left */}
+                  {issue.assignee && (
+                    <div className="flex items-center gap-2 mt-3">
                       <Avatar className="h-6 w-6">
                         <AvatarImage
                           src={issue.assignee.avatar || "/placeholder.svg"}
                           alt={issue.assignee.name}
                         />
-                        <AvatarFallback className="text-xs">
+                        <AvatarFallback className="text-xs dark:bg-gray-600 dark:text-gray-200">
                           {issue.assignee.name
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
-                    )}
-                  </div>
+                      <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                        {issue.assignee.name}
+                      </span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
       ))}
+      
+      {/* Edit Issue Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle>Edit Issue</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Edit Issue</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title" className="dark:text-gray-200">Title</Label>
               <Input
                 id="title"
                 value={editForm.title}
@@ -424,10 +426,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                   setEditForm((prev) => ({ ...prev, title: e.target.value }))
                 }
                 placeholder="Issue title"
+                className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="dark:text-gray-200">Description</Label>
               <Textarea
                 id="description"
                 value={editForm.description}
@@ -439,43 +442,44 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                 }
                 placeholder="Issue description"
                 rows={3}
+                className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
               />
             </div>
             <div>
-              <Label htmlFor="priority">Priority</Label>
+              <Label htmlFor="priority" className="dark:text-gray-200">Priority</Label>
               <Select
                 value={editForm.priority}
                 onValueChange={(value) =>
                   setEditForm((prev) => ({ ...prev, priority: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Low">Low</SelectItem>
-                  <SelectItem value="Medium">Medium</SelectItem>
-                  <SelectItem value="High">High</SelectItem>
-                  <SelectItem value="Critical">Critical</SelectItem>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem value="Low" className="dark:text-gray-100 dark:hover:bg-gray-700">Low</SelectItem>
+                  <SelectItem value="Medium" className="dark:text-gray-100 dark:hover:bg-gray-700">Medium</SelectItem>
+                  <SelectItem value="High" className="dark:text-gray-100 dark:hover:bg-gray-700">High</SelectItem>
+                  <SelectItem value="Critical" className="dark:text-gray-100 dark:hover:bg-gray-700">Critical</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status" className="dark:text-gray-200">Status</Label>
               <Select
                 value={editForm.status}
                 onValueChange={(value) =>
                   setEditForm((prev) => ({ ...prev, status: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="To Do">To Do</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="In Review">In Review</SelectItem>
-                  <SelectItem value="Done">Done</SelectItem>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem value="To Do" className="dark:text-gray-100 dark:hover:bg-gray-700">To Do</SelectItem>
+                  <SelectItem value="In Progress" className="dark:text-gray-100 dark:hover:bg-gray-700">In Progress</SelectItem>
+                  <SelectItem value="In Review" className="dark:text-gray-100 dark:hover:bg-gray-700">In Review</SelectItem>
+                  <SelectItem value="Done" className="dark:text-gray-100 dark:hover:bg-gray-700">Done</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -483,6 +487,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
               <Button
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
+                className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 Cancel
               </Button>
@@ -494,27 +499,27 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
       {/* Assign Issue Dialog */}
       <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle>Assign Issue</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Assign Issue</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="assignee-select" className="mb-2">Select Assignee</Label>
+              <Label htmlFor="assignee-select" className="mb-2 dark:text-gray-200">Select Assignee</Label>
               <Select
                 value={selectedAssigneeEmail}
                 onValueChange={setSelectedAssigneeEmail}
-  
               >
-                <SelectTrigger>
+                <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                   <SelectValue placeholder="Select a team member" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem value="unassigned" className="dark:text-gray-100 dark:hover:bg-gray-700">Unassigned</SelectItem>
                   {projectMembers.map((member) => (
                     <SelectItem
                       key={member._id || member.email}
                       value={member.email}
+                      className="dark:text-gray-100 dark:hover:bg-gray-700"
                     >
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
@@ -522,7 +527,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                             src={member.avatar || "/placeholder.svg"}
                             alt={member.name}
                           />
-                          <AvatarFallback className="text-xs">
+                          <AvatarFallback className="text-xs dark:bg-gray-600 dark:text-gray-200">
                             {member.name
                               .split(" ")
                               .map((n) => n[0])
@@ -533,7 +538,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                           <span className="text-sm font-medium">
                             {member.name}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {member.email}
                           </span>
                         </div>
@@ -543,7 +548,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                 </SelectContent>
               </Select>
               {projectMembers.length === 0 && (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   No team members found. Add members to the project first.
                 </p>
               )}
@@ -552,6 +557,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
               <Button
                 variant="outline"
                 onClick={() => setIsAssignDialogOpen(false)}
+                className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 Cancel
               </Button>

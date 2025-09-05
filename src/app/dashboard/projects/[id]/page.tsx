@@ -34,30 +34,30 @@ import { AddMemberDialog } from "@/components/add-member-dialog";
 const getStatusColor = (status: string) => {
   switch (status) {
     case "Planning":
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
     case "In Progress":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
     case "Review":
-      return "bg-orange-100 text-orange-800";
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
     case "Completed":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
   }
 };
 
 const getPriorityColor = (priority: string) => {
   switch (priority) {
     case "Critical":
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
     case "High":
-      return "bg-orange-100 text-orange-800";
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
     case "Medium":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
     case "Low":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
   }
 };
 
@@ -80,8 +80,8 @@ export default function ProjectDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading project...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 dark:text-gray-300" />
+          <p className="text-gray-600 dark:text-gray-400">Loading project...</p>
         </div>
       </div>
     );
@@ -92,8 +92,8 @@ export default function ProjectDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600 mb-4">{error}</p>
+          <AlertCircle className="h-8 w-8 text-red-500 dark:text-red-400 mx-auto mb-4" />
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
           <Button onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
@@ -108,8 +108,8 @@ export default function ProjectDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <AlertCircle className="h-8 w-8 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">Project not found</p>
+          <AlertCircle className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Project not found</p>
           <Link href="/dashboard/projects">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -174,21 +174,21 @@ export default function ProjectDetailPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Progress</span>
-                  <span className="font-medium">{project.progress}%</span>
+                  <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                  <span className="font-medium dark:text-gray-100">{project.progress}%</span>
                 </div>
                 <Progress value={project.progress} className="h-3" />
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center text-gray-600">
+                <div className="flex items-center text-gray-600 dark:text-gray-400">
                   <Calendar className="h-4 w-4 mr-2" />
                   Due:{" "}
                   {project.dueDate
                     ? new Date(project.dueDate).toLocaleDateString()
                     : "N/A"}
                 </div>
-                <div className="flex items-center text-gray-600">
+                <div className="flex items-center text-gray-600 dark:text-gray-400">
                   <Users className="h-4 w-4 mr-2" />
                   {project.members.length} team members
                 </div>
@@ -218,10 +218,10 @@ export default function ProjectDetailPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                       {member.name}
                     </p>
-                    <p className="text-xs text-gray-600 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                       {member.role}
                     </p>
                   </div>
@@ -268,8 +268,8 @@ export default function ProjectDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <AlertCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <AlertCircle className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
                 <p>Issues list will be implemented here</p>
               </div>
             </CardContent>
@@ -285,8 +285,8 @@ export default function ProjectDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
                 <p>Activity feed will be implemented here</p>
               </div>
             </CardContent>

@@ -310,7 +310,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             {column.issues.map((issue) => (
               <Card
                 key={issue._id}
-                className="cursor-move hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:shadow-lg"
+                className="cursor-move hover:shadow-md transition-shadow dark:bg-black dark:border-gray-700 dark:hover:shadow-lg"
                 draggable
                 onDragStart={() => handleDragStart(issue, column.id)}
               >

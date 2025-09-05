@@ -172,23 +172,15 @@ export default function ProjectDetailPage() {
                 </Badge>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Progress</span>
-                  <span className="font-medium">{project.progress}%</span>
-                </div>
-                <Progress value={project.progress} className="h-3" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center text-gray-600">
+              <div className="grid grid-cols-2 gap-4 text-sm ">
+                <div className="flex items-center text-gray-600 dark:text-gray-100 ">
                   <Calendar className="h-4 w-4 mr-2" />
                   Due:{" "}
                   {project.dueDate
                     ? new Date(project.dueDate).toLocaleDateString()
                     : "N/A"}
                 </div>
-                <div className="flex items-center text-gray-600">
+                <div className="flex items-center text-gray-600 dark:text-gray-100">
                   <Users className="h-4 w-4 mr-2" />
                   {project.members.length} team members
                 </div>
@@ -202,9 +194,9 @@ export default function ProjectDetailPage() {
             <CardHeader>
               <CardTitle className="text-lg">Team Members</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 ">
               {project.members.map((member) => (
-                <div key={member._id} className="flex items-center gap-3">
+                <div key={member._id} className="flex items-center gap-3 ">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={member.avatar || "/placeholder.svg"}
@@ -218,10 +210,10 @@ export default function ProjectDetailPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-gray-900 truncate dark:text-gray-100">
                       {member.name}
                     </p>
-                    <p className="text-xs text-gray-600 truncate">
+                    <p className="text-xs text-gray-600 truncate dark:text-gray-300 ">
                       {member.role}
                     </p>
                   </div>

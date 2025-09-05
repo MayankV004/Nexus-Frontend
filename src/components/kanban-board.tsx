@@ -299,7 +299,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           onDrop={(e) => handleDrop(e, column.id)}
         >
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2 dark:text-gray-100">
               {column.title}
               <Badge variant="secondary" className="text-xs">
                 {column.issues.length}

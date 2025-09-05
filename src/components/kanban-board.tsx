@@ -44,25 +44,25 @@ interface EditForm {
 const getPriorityColor = (priority: string) => {
   switch (priority) {
     case "Critical":
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700";
     case "High":
-      return "bg-orange-100 text-orange-800 border-orange-200";
+      return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-700";
     case "Medium":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700";
     case "Low":
-      return "bg-green-100 text-green-800 border-green-200";
+      return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700";
   }
 };
 
 const getLabelColor = (label: string) => {
   const colors = [
-    "bg-blue-100 text-blue-800",
-    "bg-purple-100 text-purple-800",
-    "bg-pink-100 text-pink-800",
-    "bg-indigo-100 text-indigo-800",
-    "bg-cyan-100 text-cyan-800",
+    "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200",
   ];
   return colors[label.length % colors.length];
 };
@@ -283,7 +283,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading issues...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading issues...</p>
         </div>
       </div>
     );
@@ -314,13 +314,13 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             {column.issues.map((issue) => (
               <Card
                 key={issue._id} // Use _id instead of id
-                className="cursor-move hover:shadow-md transition-shadow"
+                className="cursor-move hover:shadow-md transition-shadow dark:hover:shadow-lg dark:hover:shadow-gray-700/25 dark:bg-black"
                 draggable
                 onDragStart={() => handleDragStart(issue, column.id)}
               >
                 <CardHeader className="pb-1">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-sm font-medium leading-tight">
+                    <CardTitle className="text-sm font-medium leading-tight dark:text-gray-100">
                       {issue.title}
                     </CardTitle>
                     <DropdownMenu>
@@ -328,7 +328,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-6 w-6 p-0"
+                          className="h-6 w-6 p-0 dark:hover:bg-gray-700"
                         >
                           <MoreHorizontal className="h-3 w-3" />
                         </Button>
@@ -345,7 +345,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                           Assign to...
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="text-red-600 dark:text-red-400"
                           onClick={() => handleDeleteIssue(issue)}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
@@ -355,8 +355,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                     </DropdownMenu>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-xs text-gray-600 line-clamp-2">
+                <CardContent className="space-y-3 pb-3">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
                     {issue.description}
                   </p>
 
@@ -373,7 +373,6 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                     >
                       {issue.priority}
                     </Badge>
-                    <p className="text-red-50">{issue?.assignee?.name}</p>
                   </div>
 
                   {issue.labels && issue.labels.length > 0 && (
@@ -390,11 +389,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {/* Remove comments and attachments for now since they're not in your Issue interface */}
-                    </div>
-                    {issue.assignee && (
+                  {/* Avatar and assignee name moved to bottom left */}
+                  {issue.assignee && (
+                    <div className="flex items-center gap-2 mt-3">
                       <Avatar className="h-6 w-6">
                         <AvatarImage
                           src={issue.assignee.avatar || "/placeholder.svg"}
@@ -407,8 +404,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
-                    )}
-                  </div>
+                      <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                        {issue.assignee.name}
+                      </span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -536,10 +536,10 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium">
+                          <span className="text-sm font-medium dark:text-gray-100">
                             {member.name}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {member.email}
                           </span>
                         </div>
@@ -549,7 +549,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                 </SelectContent>
               </Select>
               {projectMembers.length === 0 && (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   No team members found. Add members to the project first.
                 </p>
               )}

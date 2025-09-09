@@ -238,8 +238,8 @@ export default function ProjectDetailPage() {
         <div className="flex items-center justify-between">
           <TabsList>
             <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
-            <TabsTrigger value="issues">Issues</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+            {/* <TabsTrigger value="issues">Issues</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger> */}
           </TabsList>
           <Button onClick={() => setIsCreateIssueOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />

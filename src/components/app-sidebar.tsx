@@ -117,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <div className="p-2 text-xs text-muted-foreground">© 2024 Nexus</div>
+        <div className="p-2 text-xs text-muted-foreground">© 2025 Nexus</div>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

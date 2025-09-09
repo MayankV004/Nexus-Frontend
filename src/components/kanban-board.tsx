@@ -586,7 +586,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           <DialogHeader>
             <DialogTitle>Delete Issue</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the issue "{deletingIssue?.title}"? This action cannot be undone and will permanently remove the issue and all its data.
+              Are you sure you want to delete the issue &quot;{deletingIssue?.title}&quot;? This action cannot be undone and will permanently remove the issue and all its data.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

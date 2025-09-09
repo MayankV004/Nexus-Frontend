@@ -17,6 +17,8 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -87,6 +89,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState<any>(false);
   const [assigningIssue, setAssigningIssue] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingIssue, setDeletingIssue] = useState<any>(null);
   const [editForm, setEditForm] = useState<EditForm>({
     title: "",
     description: "",
@@ -267,11 +271,18 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   };
 
   const handleDeleteIssue = async (issue: any) => {
-    if (!confirm("Are you sure you want to delete this issue?")) return;
+    setDeletingIssue(issue);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteIssue = async () => {
+    if (!deletingIssue) return;
 
     try {
-      await removeIssue(issue._id);
+      await removeIssue(deletingIssue._id);
       console.log("Issue deleted successfully");
+      setIsDeleteDialogOpen(false);
+      setDeletingIssue(null);
     } catch (error) {
       console.error("Failed to delete issue:", error);
     }
@@ -566,6 +577,35 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Issue</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the issue "{deletingIssue?.title}"? This action cannot be undone and will permanently remove the issue and all its data.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setDeletingIssue(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteIssue}
+            >
+              Delete Issue
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

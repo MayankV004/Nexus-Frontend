@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { FolderOpen, Users, AlertCircle, Search, Plus, MoreHorizontal, Calendar, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -45,13 +46,15 @@ const getPriorityColor = (priority: string) => {
 }
 
 export default function ProjectsPage() {
-  const { projects , fetchAllProjects,clearProjectError,  error } = useProjects()
+  const { projects, fetchAllProjects, deleteExistingProject, clearProjectError, error } = useProjects()
  
 
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false)
+  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
@@ -62,6 +65,19 @@ export default function ProjectsPage() {
 
     return matchesSearch && matchesStatus && matchesPriority
   })
+
+  const handleDeleteProject = async () => {
+    if (deleteProjectId) {
+      await deleteExistingProject(deleteProjectId)
+      setIsDeleteDialogOpen(false)
+      setDeleteProjectId(null)
+    }
+  }
+
+  const openDeleteDialog = (projectId: string) => {
+    setDeleteProjectId(projectId)
+    setIsDeleteDialogOpen(true)
+  }
 
   useEffect(() => {
       fetchAllProjects();
@@ -221,8 +237,16 @@ export default function ProjectsPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>Edit Project</DropdownMenuItem>
-                      <DropdownMenuItem>Archive Project</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">Delete Project</DropdownMenuItem>
+                      {/* <DropdownMenuItem>Archive Project</DropdownMenuItem> */}
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          openDeleteDialog(project._id)
+                        }}
+                      >
+                        Delete Project
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -240,13 +264,13 @@ export default function ProjectsPage() {
                   </Badge>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Progress</span>
                     <span className="font-medium">{project.progress}%</span>
                   </div>
                   <Progress value={project.progress} className="h-2" />
-                </div>
+                </div> */}
 
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <div className="flex items-center gap-4">
@@ -295,6 +319,32 @@ export default function ProjectsPage() {
       )}
 
       <CreateProjectDialog open={isCreateProjectOpen} onOpenChange={setIsCreateProjectOpen} />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this project? This action cannot be undone and will permanently remove all project data, issues, and associated content.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteProject}
+            >
+              Delete Project
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

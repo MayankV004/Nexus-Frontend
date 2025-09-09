@@ -312,7 +312,7 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">
                               Progress
@@ -322,7 +322,7 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <Progress value={project.progress} className="h-2" />
-                        </div>
+                        </div> */}
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">

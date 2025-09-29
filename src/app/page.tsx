@@ -3,7 +3,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, CheckCircle, Users, Zap,BarChart3, Sparkles } from "lucide-react"
 import Link from "next/link"
-
+import Image from "next/image"
 
 export default function LandingPage() {
   return (
@@ -12,8 +12,14 @@ export default function LandingPage() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50 dark:bg-gray-950/80">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Zap className="text-white h-5 w-5" />
+            <div >
+              <Image
+                src="/logo.png"
+                alt="Nexus Logo"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
             </div>
             <div>
               <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">

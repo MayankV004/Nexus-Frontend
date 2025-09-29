@@ -4,7 +4,7 @@ import type * as React from "react"
 import { Home, FolderOpen, AlertCircle, Zap } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-
+import Image from "next/image"
 import {
   Sidebar,
   SidebarContent,
@@ -77,8 +77,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg">
-            <Zap className="h-4 w-4" />
+          <div className="">
+            <Image
+              src="/logo.png"
+              alt="Nexus Logo"  
+              width={24}
+              height={24}
+              className="rounded-lg"
+            />
+
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">Nexus</span>

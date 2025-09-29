@@ -77,13 +77,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
-          <div className="">
+          <div className="flex-shrink-0">
             <Image
               src="/logo.png"
               alt="Nexus Logo"  
               width={24}
               height={24}
-              className="rounded-lg"
+              className="rounded-lg transition-all duration-200 group-data-[collapsible=icon]:w-6 group-data-[collapsible=icon]:h-6"
             />
 
           </div>

@@ -69,7 +69,7 @@ const getPriorityColor = (priority: string) => {
 // };
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, fetchUserProfile, isAuthenticated, isLoading: authLoading } = useAuth();
   const { 
     projects, 
     isLoading, 
@@ -79,10 +79,21 @@ export default function DashboardPage() {
     getProjectsByStatus,
     clearProjectError 
   } = useProjects();
+  
   // Fetch projects on component mount
   useEffect(() => {
     fetchAllProjects();
   }, [fetchAllProjects]);
+
+  // Fetch user profile on component mount if authenticated but no user data
+  useEffect(() => {
+    if (isAuthenticated && !user) {
+      console.log('Dashboard: Fetching user profile...');
+      fetchUserProfile().catch((error) => {
+        console.error('Dashboard: Failed to fetch user profile:', error);
+      });
+    }
+  }, [isAuthenticated, user, fetchUserProfile]);
 
   // Clear error when component unmounts
   useEffect(() => {
@@ -93,6 +104,8 @@ export default function DashboardPage() {
     };
   }, [error, clearProjectError]);
   
+
+
   const stats = [
     {
       name: "Active Projects",
@@ -172,12 +185,14 @@ export default function DashboardPage() {
     .sort((a, b) => a.daysLeft - b.daysLeft)
     .slice(0, 3);
 
-    if (isLoading && projects.length === 0) {
+    if ((isLoading && projects.length === 0) || (authLoading && !user)) {
     return (
       <div className="space-y-8 w-full">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-muted-foreground">Loading projects...</span>
+          <span className="ml-2 text-muted-foreground">
+            {authLoading && !user ? 'Loading user data...' : 'Loading projects...'}
+          </span>
         </div>
       </div>
     );
@@ -206,7 +221,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <div>
             <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
-              Welcome back, {user?.name}!
+              Welcome back, {user?.name || 'User'}!
             </h1>
             <p className="text-muted-foreground">
               Here&apos;s what&apos;s happening with your projects today.

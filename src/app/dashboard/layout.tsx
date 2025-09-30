@@ -29,7 +29,7 @@ export default function DashboardLayout({
 
   const getBreadcrumbs = () => {
     const segments = pathname.split("/").filter(Boolean)
-    console.log("segments: ",segments)
+    // console.log("segments: ",segments)
     const breadcrumbs = []
 
     if (segments[1] === "projects") {
@@ -45,13 +45,13 @@ export default function DashboardLayout({
     } else {
       breadcrumbs.push({ name: "Dashboard", href: "/dashboard" })
     }
-    console.log("function : ", breadcrumbs)
+    // console.log("function : ", breadcrumbs)
 
     return breadcrumbs
   }
 
   const breadcrumbs = getBreadcrumbs()
-  console.log("Second : ",breadcrumbs)
+  // console.log("Second : ",breadcrumbs)
   return (
     <SidebarProvider>
     <div className="flex min-h-screen w-full ">
